@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sulawko.github.io/monster-input-buffer/sitemap.xml

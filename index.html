@@ -6,9 +6,42 @@
   <title>Monster Input Buffer — Geometry Dash 2.208</title>
   <meta name="description" content="Monster Input Buffer: la herramienta definitiva para jugar Geometry Dash como nunca. Precisión total, reacción instantánea y fluidez absoluta." />
   <meta name="theme-color" content="#0a0714" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://sulawko.github.io/monster-input-buffer/" />
+
+  <!-- Open Graph / Twitter (vista previa al compartir el link) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Monster Input Buffer" />
+  <meta property="og:title" content="Monster Input Buffer — Geometry Dash 2.208" />
+  <meta property="og:description" content="Un mod de la comunidad para Geometry Dash 2.208: menos pelea con el timing, más flow." />
+  <meta property="og:url" content="https://sulawko.github.io/monster-input-buffer/" />
+  <meta property="og:image" content="https://sulawko.github.io/monster-input-buffer/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="es_AR" />
+  <meta property="og:locale:alternate" content="en_US" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Monster Input Buffer — Geometry Dash 2.208" />
+  <meta name="twitter:description" content="Un mod de la comunidad para Geometry Dash 2.208: menos pelea con el timing, más flow." />
+  <meta name="twitter:image" content="https://sulawko.github.io/monster-input-buffer/og-image.png" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Monster Input Buffer",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "Windows",
+    "description": "Mod de la comunidad para Geometry Dash 2.208.",
+    "url": "https://sulawko.github.io/monster-input-buffer/",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
 
   <!-- Favicon -->
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0714'/%3E%3Cpath d='M8 24V8l16 16V8' stroke='%23a855f7' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 
   <!-- Fuentes -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -42,6 +75,7 @@
        BASE
     ============================================================ */
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    [hidden] { display: none !important; }
     html { scroll-behavior: smooth; }
     body {
       background: var(--bg);
@@ -267,7 +301,7 @@
       background: rgba(10, 10, 18, 0.5);
     }
     .stats-inner {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 24px;
       max-width: 1100px; margin: 0 auto; padding: 44px 24px;
     }
     .stat { text-align: center; }
@@ -409,12 +443,130 @@
     .reveal.visible { opacity: 1; transform: none; }
 
     /* ============================================================
+       NAV: grupo izquierdo + iconos chicos (GitHub / Discord) + idioma
+    ============================================================ */
+    .nav-left { display: flex; align-items: center; gap: 14px; }
+    .nav-social { display: flex; align-items: center; gap: 8px; }
+    .icon-btn {
+      width: 34px; height: 34px; display: grid; place-items: center;
+      border-radius: 10px; color: var(--muted); text-decoration: none;
+      border: 1px solid var(--border); background: rgba(168, 85, 247, 0.06);
+      transition: color 0.3s, border-color 0.3s, background 0.3s, transform 0.3s var(--ease), box-shadow 0.3s;
+    }
+    .icon-btn:hover, .icon-btn:focus-visible {
+      color: #fff; border-color: var(--purple-3); background: rgba(168, 85, 247, 0.18);
+      transform: translateY(-2px); box-shadow: 0 10px 24px -10px rgba(168, 85, 247, 0.7);
+    }
+    .lang-btn {
+      font-family: var(--font-display); font-weight: 600; font-size: 12px; letter-spacing: 0.08em;
+      color: var(--muted); background: rgba(168, 85, 247, 0.06); cursor: pointer;
+      border: 1px solid var(--border); border-radius: 999px; padding: 7px 13px;
+      transition: color 0.3s, border-color 0.3s, background 0.3s;
+    }
+    .lang-btn:hover { color: #fff; border-color: var(--purple-3); background: rgba(168, 85, 247, 0.18); }
+    .nav-links .lang-item { display: flex; }
+
+    :focus-visible { outline: 2px solid var(--purple-3); outline-offset: 3px; border-radius: 6px; }
+    .skip-link {
+      position: fixed; left: 12px; top: -60px; z-index: 200; padding: 10px 16px; border-radius: 10px;
+      background: var(--purple-2); color: #fff; text-decoration: none; font-size: 14px; transition: top 0.2s;
+    }
+    .skip-link:focus { top: 12px; }
+
+    /* Estado "descarga próximamente" */
+    .btn[aria-disabled="true"] { cursor: default; }
+    .btn.is-soon { animation: none; }
+    .btn.is-soon:hover { transform: none; }
+
+    /* ============================================================
+       INSTALACIÓN (pasos)
+    ============================================================ */
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; counter-reset: step; }
+    .step { position: relative; padding: 34px 28px 30px; }
+    .step-num {
+      font-family: var(--font-display); font-weight: 700; font-size: 2.6rem; line-height: 1;
+      background: linear-gradient(180deg, #fff, var(--purple)); -webkit-background-clip: text;
+      background-clip: text; color: transparent; margin-bottom: 14px;
+    }
+    .step h3 { font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 8px; }
+    .step p { color: var(--muted); font-size: 0.95rem; line-height: 1.7; }
+    .req { margin-top: 28px; text-align: center; color: var(--muted); font-size: 14px; }
+    .req strong { color: var(--purple-3); font-weight: 600; }
+
+    /* ============================================================
+       VIDEO (se muestra solo si se configura un ID de YouTube)
+    ============================================================ */
+    .video-wrap {
+      position: relative; aspect-ratio: 16 / 9; max-width: 900px; margin: 0 auto;
+      border-radius: 22px; overflow: hidden; border: 1px solid var(--border-strong);
+      box-shadow: 0 34px 90px -34px rgba(168, 85, 247, 0.5); background: var(--surface);
+    }
+    .video-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    /* ============================================================
+       FAQ
+    ============================================================ */
+    .faq { max-width: 820px; margin: 0 auto; display: grid; gap: 12px; }
+    .faq details {
+      border: 1px solid var(--border); border-radius: 16px; padding: 0 24px;
+      background: linear-gradient(180deg, rgba(22, 22, 34, 0.5), rgba(10, 10, 18, 0.5));
+      transition: border-color 0.3s, background 0.3s;
+    }
+    .faq details[open] { border-color: var(--border-strong); }
+    .faq summary {
+      list-style: none; cursor: pointer; padding: 20px 0; display: flex; justify-content: space-between;
+      align-items: center; gap: 16px; font-family: var(--font-display); font-weight: 600; font-size: 1.04rem;
+    }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary::after {
+      content: "+"; font-size: 1.5rem; line-height: 1; color: var(--purple-3);
+      transition: transform 0.3s var(--ease); flex-shrink: 0;
+    }
+    .faq details[open] summary::after { transform: rotate(45deg); }
+    .faq details p { color: var(--muted); padding: 0 0 22px; line-height: 1.75; font-size: 0.96rem; }
+    .faq details p a { color: var(--purple-3); }
+
+    /* ============================================================
+       CHANGELOG
+    ============================================================ */
+    .changelog { max-width: 820px; margin: 0 auto; border-left: 1px solid var(--border-strong); padding-left: 28px; display: grid; gap: 30px; }
+    .rel { position: relative; }
+    .rel::before {
+      content: ""; position: absolute; left: -35px; top: 8px; width: 13px; height: 13px; border-radius: 50%;
+      background: var(--neon); box-shadow: 0 0 14px var(--neon);
+    }
+    .rel h3 { font-family: var(--font-display); font-size: 1.15rem; }
+    .rel h3 small { color: var(--muted); font-weight: 500; font-size: 0.82rem; margin-left: 8px; letter-spacing: 0.04em; }
+    .rel ul { margin-top: 10px; padding-left: 18px; color: var(--muted); line-height: 1.8; font-size: 0.96rem; }
+
+    /* ============================================================
+       SEGURIDAD / HASH
+    ============================================================ */
+    .trust { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .hash-box {
+      margin-top: 28px; padding: 18px 22px; border-radius: 16px; border: 1px solid var(--border);
+      background: rgba(10, 10, 18, 0.6); display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
+    }
+    .hash-box code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 12.5px; color: var(--purple-3); word-break: break-all; flex: 1 1 280px; }
+    .hash-box .lbl { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+    .copy-btn {
+      font-family: var(--font-display); font-weight: 600; font-size: 12px; cursor: pointer; color: var(--text);
+      border: 1px solid var(--border-strong); background: rgba(168, 85, 247, 0.1); border-radius: 999px; padding: 7px 14px;
+    }
+    .copy-btn:hover { background: rgba(168, 85, 247, 0.22); }
+
+    /* Comunidad (Discord) */
+    .community-card { text-align: center; padding: 56px 32px; max-width: 820px; margin: 0 auto; }
+    .community-card p { color: var(--muted); max-width: 520px; margin: 16px auto 0; line-height: 1.75; }
+    .community-card .row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
+
+    /* ============================================================
        RESPONSIVE
     ============================================================ */
     @media (max-width: 900px) {
-      .grid-3 { grid-template-columns: 1fr; }
+      .grid-3, .steps, .trust { grid-template-columns: 1fr; }
       .split { grid-template-columns: 1fr; gap: 40px; }
-      .stats-inner { grid-template-columns: repeat(2, 1fr); gap: 36px 16px; }
+      .stats-inner { gap: 36px 16px; }
       .visual { height: 240px; }
     }
     @media (max-width: 820px) {
@@ -431,6 +583,13 @@
       .nav-links.open { transform: translateX(0); }
       .nav-links a { font-size: 22px; }
     }
+    @media (max-width: 480px) {
+      .logo small { display: none; }
+      .nav-left { gap: 10px; }
+      .icon-btn { width: 32px; height: 32px; }
+      .cta-card { padding: 56px 22px; }
+      .btn-lg { padding: 16px 26px; font-size: 15px; }
+    }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; transition-duration: 0.001s !important; }
       html { scroll-behavior: auto; }
@@ -439,90 +598,104 @@
   </style>
 </head>
 <body>
+  <a href="#main" class="skip-link" data-i18n="skip">Saltar al contenido</a>
   <canvas id="bg" aria-hidden="true"></canvas>
   <div class="cursor-glow" aria-hidden="true"></div>
 
   <!-- ============ NAVBAR ============ -->
   <header class="nav">
-    <a href="#" class="logo">
-      <span class="logo-mark">M</span>
-      <span>MONSTER <small>INPUT BUFFER</small></span>
-    </a>
-    <ul class="nav-links">
-      <li><a href="#features">Características</a></li>
-      <li><a href="#showcase">Por qué</a></li>
-      <li><a href="#community">Comunidad</a></li>
-      <li><a href="#download" class="btn btn-primary btn-sm">Descargar</a></li>
+    <div class="nav-left">
+      <a href="#" class="logo" aria-label="Monster Input Buffer">
+        <span class="logo-mark">M</span>
+        <span>MONSTER <small>INPUT BUFFER</small></span>
+      </a>
+      <!-- Botones chicos: GitHub y Discord -->
+      <div class="nav-social">
+        <a class="icon-btn" href="https://github.com/sulawko/monster-input-buffer" target="_blank" rel="noopener" aria-label="GitHub" data-i18n-attr="aria-label:gh_label" title="GitHub">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12.25c0 5.2 3.35 9.6 8.02 11.15.59.11.8-.26.8-.57v-2.1c-3.26.72-3.95-1.4-3.95-1.4-.53-1.38-1.3-1.75-1.3-1.75-1.06-.74.08-.72.08-.72 1.18.08 1.8 1.23 1.8 1.23 1.04 1.82 2.73 1.3 3.4.99.1-.77.41-1.3.74-1.6-2.6-.3-5.34-1.32-5.34-5.9 0-1.3.46-2.37 1.2-3.2-.12-.3-.52-1.52.12-3.17 0 0 .98-.32 3.2 1.22a11 11 0 0 1 5.82 0c2.22-1.54 3.2-1.22 3.2-1.22.64 1.65.24 2.87.12 3.17.75.83 1.2 1.9 1.2 3.2 0 4.59-2.74 5.6-5.35 5.89.42.37.8 1.1.8 2.22v3.29c0 .32.21.7.81.57A11.76 11.76 0 0 0 23.5 12.25 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+        <a class="icon-btn" href="https://discord.gg/dsYchZdGvf" target="_blank" rel="noopener" aria-label="Discord" title="Discord">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.32 4.37A19.8 19.8 0 0 0 15.43 2.9a.07.07 0 0 0-.08.04c-.21.38-.45.87-.61 1.26a18.3 18.3 0 0 0-5.49 0c-.17-.4-.4-.88-.62-1.26a.08.08 0 0 0-.08-.04 19.7 19.7 0 0 0-4.89 1.47.07.07 0 0 0-.03.03C.5 9.05-.32 13.6.1 18.09a.08.08 0 0 0 .03.05 19.9 19.9 0 0 0 5.99 3.03.08.08 0 0 0 .08-.03c.46-.63.87-1.3 1.22-2a.08.08 0 0 0-.04-.1 13 13 0 0 1-1.87-.9.08.08 0 0 1-.01-.13l.37-.29a.07.07 0 0 1 .08-.01c3.93 1.8 8.18 1.8 12.07 0a.07.07 0 0 1 .08.01l.37.29a.08.08 0 0 1-.01.13c-.6.35-1.22.65-1.87.9a.08.08 0 0 0-.04.1c.36.7.77 1.37 1.22 2a.08.08 0 0 0 .08.03 19.8 19.8 0 0 0 6-3.03.08.08 0 0 0 .03-.05c.5-5.18-.84-9.68-3.55-13.67a.06.06 0 0 0-.03-.03ZM8.02 15.33c-1.18 0-2.16-1.08-2.16-2.42s.96-2.42 2.16-2.42c1.21 0 2.18 1.09 2.16 2.42 0 1.34-.96 2.42-2.16 2.42Zm7.97 0c-1.18 0-2.16-1.08-2.16-2.42s.95-2.42 2.16-2.42c1.2 0 2.17 1.09 2.16 2.42 0 1.34-.95 2.42-2.16 2.42Z"/></svg>
+        </a>
+      </div>
+    </div>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#features" data-i18n="nav_features">Características</a></li>
+      <li><a href="#install" data-i18n="nav_install">Instalación</a></li>
+      <li><a href="#faq" data-i18n="nav_faq">FAQ</a></li>
+      <li><a href="#community" data-i18n="nav_community">Comunidad</a></li>
+      <li class="lang-item"><button type="button" class="lang-btn" id="lang-toggle" aria-label="Cambiar idioma / Change language">EN</button></li>
+      <li><a href="#download" class="btn btn-primary btn-sm" data-i18n="nav_download">Descargar</a></li>
     </ul>
-    <button class="nav-toggle" aria-label="Abrir menú"><span></span></button>
+    <button class="nav-toggle" aria-label="Abrir menú" aria-controls="nav-links" aria-expanded="false" data-i18n-attr="aria-label:menu_label"><span></span></button>
   </header>
 
-  <main>
+  <main id="main">
     <!-- ============ HERO ============ -->
     <section class="hero">
       <div class="orb orb-1"></div>
       <div class="orb orb-2"></div>
 
-      <span class="badge rise d1"><span class="dot"></span> Disponible para Geometry Dash 2.208</span>
+      <span class="badge rise d1"><span class="dot"></span> <span data-i18n="badge">Disponible para Geometry Dash 2.208</span></span>
       <h1 class="hero-title rise d2">
         <span class="line line-1">Monster</span>
         <span class="line line-2">Input Buffer</span>
       </h1>
-      <p class="hero-sub rise d3">La herramienta definitiva para que jugar se sienta imposiblemente fácil.</p>
-      <p class="hero-copy rise d4">
-        Olvidate del timing frustrante. Monster Input Buffer borra la fricción entre tu mano y el juego
-        para que cada salto caiga exacto, sin esfuerzo. Vos concentrate en la música… y en ganar.
+      <p class="hero-sub rise d3" data-i18n="hero_sub">Un mod de la comunidad para que jugar se sienta mucho más fácil.</p>
+      <p class="hero-copy rise d4" data-i18n="hero_copy">
+        Olvidate del timing frustrante. Monster Input Buffer acorta la distancia entre tu mano y el juego
+        para que cada salto caiga cuando lo pensaste. Vos concentrate en la música… y en ganar.
       </p>
       <div class="hero-actions rise d5">
         <a href="#download" class="btn btn-primary btn-lg btn-pulse">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
-          Descargar ahora
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
+          <span data-i18n="cta_hero">Descargar ahora</span>
         </a>
-        <a href="#showcase" class="btn btn-ghost btn-lg">Ver cómo se siente</a>
+        <a href="#showcase" class="btn btn-ghost btn-lg" data-i18n="cta_feel">Ver cómo se siente</a>
       </div>
-      <p class="hero-note rise d6">Gratis · Windows · v2.208 · Instalación en un clic</p>
+      <p class="hero-note rise d6" data-i18n="hero_note">Gratis · Para Geometry Dash 2.208 · Hecho por la comunidad</p>
 
       <div class="scroll-hint" aria-hidden="true"><span class="chev"></span></div>
     </section>
 
-    <!-- ============ STATS ============ -->
+    <!-- ============ STATS (solo datos verdaderos) ============ -->
     <section class="stats">
       <div class="stats-inner">
-        <div class="stat reveal"><div class="stat-value" data-target="100" data-suffix="%">0%</div><div class="stat-label">Precisión en tus saltos</div></div>
-        <div class="stat reveal" style="--d:.08s"><div class="stat-value" data-target="10" data-suffix="K+">0</div><div class="stat-label">Jugadores lo usan</div></div>
-        <div class="stat reveal" style="--d:.16s"><div class="stat-value" data-target="2.208" data-decimals="3">0</div><div class="stat-label">Versión compatible</div></div>
-        <div class="stat reveal" style="--d:.24s"><div class="stat-value">∞</div><div class="stat-label">Niveles por dominar</div></div>
+        <div class="stat reveal"><div class="stat-value" data-target="2.208" data-decimals="3">2.208</div><div class="stat-label" data-i18n="stat_version">Versión compatible</div></div>
+        <div class="stat reveal" style="--d:.08s"><div class="stat-value">0 $</div><div class="stat-label" data-i18n="stat_free">Costo, siempre gratis</div></div>
+        <div class="stat reveal" id="dl-stat" style="--d:.16s" hidden><div class="stat-value" id="dl-count" data-target="0">0</div><div class="stat-label" data-i18n="stat_downloads">Descargas</div></div>
+        <div class="stat reveal" style="--d:.24s"><div class="stat-value">∞</div><div class="stat-label" data-i18n="stat_levels">Niveles por dominar</div></div>
       </div>
     </section>
 
     <!-- ============ FEATURES ============ -->
     <section class="section" id="features">
       <div class="section-head reveal">
-        <div class="eyebrow">Por qué Monster Input Buffer</div>
-        <h2 class="section-title">Diseñado para que solo pienses en jugar.</h2>
-        <p class="section-sub">Sin configuraciones complicadas, sin tecnicismos. Instalás, jugás y sentís la diferencia desde el primer intento.</p>
+        <div class="eyebrow" data-i18n="feat_eyebrow">Por qué Monster Input Buffer</div>
+        <h2 class="section-title" data-i18n="feat_title">Diseñado para que solo pienses en jugar.</h2>
+        <p class="section-sub" data-i18n="feat_sub">Sin configuraciones complicadas, sin tecnicismos. Instalás, jugás y sentís la diferencia.</p>
       </div>
       <div class="grid-3">
         <article class="card tilt reveal">
           <div class="card-icon">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 12l4-4"/><path d="M12 12l-4-4"/><circle cx="12" cy="12" r="2.2"/></svg>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 12l4-4"/><path d="M12 12l-4-4"/><circle cx="12" cy="12" r="2.2"/></svg>
           </div>
-          <h3>Precisión quirúrgica</h3>
-          <p>Cada click cae donde debe, exactamente cuando debe. Se acabaron los saltos que se pierden por milésimas.</p>
+          <h3 data-i18n="f1_t">Precisión</h3>
+          <p data-i18n="f1_p">Tus clicks se registran cuando los querés. Menos saltos perdidos por milésimas de diferencia.</p>
         </article>
         <article class="card tilt reveal" style="--d:.1s">
           <div class="card-icon">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg>
           </div>
-          <h3>Reacción instantánea</h3>
-          <p>Tu input se traduce al instante, sin fricción entre tu mano y la pantalla. Reaccionás más rápido sin esforzarte.</p>
+          <h3 data-i18n="f2_t">Respuesta ágil</h3>
+          <p data-i18n="f2_p">Tu input se traduce rápido, sin esa sensación de pelear contra el juego.</p>
         </article>
         <article class="card tilt reveal" style="--d:.2s">
           <div class="card-icon">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12c2.5-3 5-3 7.5 0s5 3 7.5 0 3-2 5 0"/><path d="M2 18c2.5-3 5-3 7.5 0s5 3 7.5 0 3-2 5 0"/></svg>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12c2.5-3 5-3 7.5 0s5 3 7.5 0 3-2 5 0"/><path d="M2 18c2.5-3 5-3 7.5 0s5 3 7.5 0 3-2 5 0"/></svg>
           </div>
-          <h3>Fluidez total</h3>
-          <p>Jugá más relajado y más rápido. El juego por fin se siente como debería haberse sentido siempre.</p>
+          <h3 data-i18n="f3_t">Más fluidez</h3>
+          <p data-i18n="f3_p">Jugá más relajado. El ritmo del nivel manda, no la ansiedad por el timing.</p>
         </article>
       </div>
     </section>
@@ -531,63 +704,144 @@
     <section class="section" id="showcase">
       <div class="split">
         <div class="split-copy reveal">
-          <div class="eyebrow">La experiencia</div>
-          <h2 class="section-title">Menos pelea. Más flow.</h2>
-          <p>
+          <div class="eyebrow" data-i18n="show_eyebrow">La experiencia</div>
+          <h2 class="section-title" data-i18n="show_title">Menos pelea. Más flow.</h2>
+          <p data-i18n="show_p">
             Olvidate de apretar el botón "por las dudas" y fallar igual. Monster Input Buffer
-            convierte tu ritmo natural en precisión perfecta, para que entres en ese estado donde
-            el nivel fluye y vos solo seguís la música.
+            acompaña tu ritmo natural para que entres en ese estado donde el nivel fluye y vos solo seguís la música.
           </p>
           <div class="feature-chips">
-            <span class="chip">Sin configuración</span>
-            <span class="chip">Compatible 2.208</span>
-            <span class="chip">Ligero y limpio</span>
-            <span class="chip">Hecho por la comunidad</span>
+            <span class="chip" data-i18n="chip1">Sin configuración</span>
+            <span class="chip" data-i18n="chip2">Compatible 2.208</span>
+            <span class="chip" data-i18n="chip3">Ligero y limpio</span>
+            <span class="chip" data-i18n="chip4">Hecho por la comunidad</span>
           </div>
         </div>
-        <div class="visual reveal" style="--d:.15s">
+        <div class="visual reveal" style="--d:.15s" aria-hidden="true">
           <div class="bars" id="bars"></div>
         </div>
       </div>
     </section>
 
-    <!-- ============ TESTIMONIOS ============ -->
-    <section class="section" id="community">
+    <!-- ============ VIDEO (aparece solo si se configura YOUTUBE_ID) ============ -->
+    <section class="section" id="video" hidden>
       <div class="section-head reveal">
-        <div class="eyebrow">Comunidad</div>
-        <h2 class="section-title">Lo que dicen los jugadores.</h2>
+        <div class="eyebrow" data-i18n="vid_eyebrow">En acción</div>
+        <h2 class="section-title" data-i18n="vid_title">Mirá cómo funciona.</h2>
       </div>
-      <div class="grid-3">
-        <article class="card reveal">
-          <p class="quote">"Antes fallaba saltos que juraba haber tocado bien. Ahora siento que el juego me escucha. Es otro mundo."</p>
-          <div class="person"><div class="avatar">P</div><div><div class="name">@pixelPuncher</div><div class="role">Demon slayer</div></div></div>
+      <div class="video-wrap reveal" id="video-slot"></div>
+    </section>
+
+    <!-- ============ INSTALACIÓN ============ -->
+    <section class="section" id="install">
+      <div class="section-head reveal">
+        <div class="eyebrow" data-i18n="inst_eyebrow">Instalación</div>
+        <h2 class="section-title" data-i18n="inst_title">Listo en tres pasos.</h2>
+        <p class="section-sub" data-i18n="inst_sub">Sin complicaciones. Si algo no sale, pasá por el Discord y te damos una mano.</p>
+      </div>
+      <div class="steps">
+        <article class="card step reveal">
+          <div class="step-num">1</div>
+          <h3 data-i18n="s1_t">Descargá el mod</h3>
+          <p data-i18n="s1_p">Bajá la última versión desde el botón de descarga. Siempre desde esta página o el repositorio oficial.</p>
         </article>
-        <article class="card reveal" style="--d:.1s">
-          <p class="quote">"Instalé, jugué y no pude volver atrás. La diferencia es tan grande que parece trampa, pero no lo es."</p>
-          <div class="person"><div class="avatar">S</div><div><div class="name">@speedrunnerGD</div><div class="role">Speedrunner</div></div></div>
+        <article class="card step reveal" style="--d:.1s">
+          <div class="step-num">2</div>
+          <h3 data-i18n="s2_t">Instalalo</h3>
+          <p data-i18n="s2_p">Seguí las instrucciones que vienen con el archivo para agregarlo a tu Geometry Dash 2.208.</p>
         </article>
-        <article class="card reveal" style="--d:.2s">
-          <p class="quote">"Limpio, rápido y sin drama. Justo lo que todo mod debería ser. Gracias por existir."</p>
-          <div class="person"><div class="avatar">M</div><div><div class="name">@mapMaker</div><div class="role">Creador de niveles</div></div></div>
+        <article class="card step reveal" style="--d:.2s">
+          <div class="step-num">3</div>
+          <h3 data-i18n="s3_t">Abrí el juego y jugá</h3>
+          <p data-i18n="s3_p">Iniciá Geometry Dash, entrá a un nivel y sentí la diferencia desde el primer intento.</p>
         </article>
+      </div>
+      <p class="req" data-i18n-html="req"><strong>Requisitos:</strong> Geometry Dash versión 2.208 en PC.</p>
+    </section>
+
+    <!-- ============ FAQ ============ -->
+    <section class="section" id="faq">
+      <div class="section-head reveal">
+        <div class="eyebrow" data-i18n="faq_eyebrow">Preguntas frecuentes</div>
+        <h2 class="section-title" data-i18n="faq_title">Lo que más preguntan.</h2>
+      </div>
+      <div class="faq reveal">
+        <details>
+          <summary data-i18n="q1">¿Es seguro?</summary>
+          <p data-i18n-html="a1">Es un mod no oficial de la comunidad. Descargalo solo desde esta página o desde el <a href="https://github.com/sulawko/monster-input-buffer" target="_blank" rel="noopener">repositorio oficial</a> y, si se publica el hash SHA-256, comprobá que coincida con el de tu archivo. Si tu antivirus protesta con un mod, es normal que pase con este tipo de archivos: consultá en el Discord ante cualquier duda.</p>
+        </details>
+        <details>
+          <summary data-i18n="q2">¿Es trampa? ¿Puedo usarlo para mis records?</summary>
+          <p data-i18n="a2">Monster Input Buffer es un input buffer: ayuda con el timing de tus clicks. Las reglas sobre qué mods se aceptan para records o rankings las define cada comunidad, lista o moderador, así que consultalas antes de enviar un record. Para jugar y practicar, no hay problema.</p>
+        </details>
+        <details>
+          <summary data-i18n="q3">¿Me pueden banear por usarlo?</summary>
+          <p data-i18n="a3">No es un mod oficial de RobTop y no controlamos las reglas de terceros (listas, servidores o torneos). Usalo bajo tu propio criterio y revisá las reglas de donde vayas a competir.</p>
+        </details>
+        <details>
+          <summary data-i18n="q4">¿Es compatible con otros mods?</summary>
+          <p data-i18n="a4">Está pensado para Geometry Dash 2.208. Si notás un conflicto con otro mod, contanos cuál es en el Discord o abrí un reporte en GitHub y lo revisamos.</p>
+        </details>
+        <details>
+          <summary data-i18n="q5">No funciona, ¿qué hago?</summary>
+          <p data-i18n-html="a5">Comprobá que tu juego sea la versión 2.208 y que hayas seguido los pasos de instalación. Si sigue sin andar, <a href="https://discord.gg/dsYchZdGvf" target="_blank" rel="noopener">escribinos en el Discord</a> o <a href="https://github.com/sulawko/monster-input-buffer/issues" target="_blank" rel="noopener">abrí un reporte en GitHub</a>.</p>
+        </details>
+        <details>
+          <summary data-i18n="q6">¿Cuesta algo?</summary>
+          <p data-i18n="a6">No. Es gratis y lo va a seguir siendo.</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- ============ CHANGELOG ============ -->
+    <section class="section" id="changelog">
+      <div class="section-head reveal">
+        <div class="eyebrow" data-i18n="log_eyebrow">Versiones</div>
+        <h2 class="section-title" data-i18n="log_title">Novedades.</h2>
+      </div>
+      <div class="changelog reveal">
+        <div class="rel">
+          <h3>v2.208 <small data-i18n="log_first">Primera versión pública</small></h3>
+          <ul>
+            <li data-i18n="log1">Lanzamiento del mod para Geometry Dash 2.208.</li>
+            <li data-i18n="log2">Los próximos cambios se van a publicar acá y en el Discord.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ COMUNIDAD ============ -->
+    <section class="section" id="community">
+      <div class="card community-card reveal">
+        <div class="eyebrow" data-i18n="com_eyebrow">Comunidad</div>
+        <h2 class="section-title" data-i18n="com_title">Sumate, probalo y contanos.</h2>
+        <p data-i18n="com_p">Acá se comparten dudas, sugerencias y reportes. Tu feedback hace mejor al mod.</p>
+        <div class="row">
+          <a href="https://discord.gg/dsYchZdGvf" target="_blank" rel="noopener" class="btn btn-primary btn-sm" data-i18n="com_discord">Unirse al Discord</a>
+          <a href="https://github.com/sulawko/monster-input-buffer/issues" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" data-i18n="com_bug">Reportar un bug</a>
+        </div>
       </div>
     </section>
 
     <!-- ============ CTA FINAL ============ -->
     <section class="section" id="download">
       <div class="cta-card reveal">
-        <div class="eyebrow">Descarga</div>
-        <h2>Listo para dominar el juego?</h2>
-        <p>Un clic y estás jugando como nunca. Gratis, seguro y compatible con la versión 2.208.</p>
+        <div class="eyebrow" data-i18n="dl_eyebrow">Descarga</div>
+        <h2 data-i18n="dl_title">¿Listo para dominar el juego?</h2>
+        <p data-i18n="dl_p">Gratis y compatible con la versión 2.208 de Geometry Dash.</p>
         <div class="cta-actions">
-          <!-- ⬇⬇ REEMPLAZÁ el href por la URL real del archivo de descarga ⬇⬇ -->
-          <a href="#" class="btn btn-primary btn-lg btn-pulse">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
-            Descargar Monster Input Buffer
+          <a href="#download" id="dl-btn" class="btn btn-primary btn-lg btn-pulse">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
+            <span id="dl-label" data-i18n="dl_btn">Descargar Monster Input Buffer</span>
           </a>
-          <a href="https://discord.gg/dsYchZdGvf" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">Unirse al Discord</a>
+          <a href="https://discord.gg/dsYchZdGvf" target="_blank" rel="noopener" class="btn btn-ghost btn-lg" data-i18n="com_discord">Unirse al Discord</a>
         </div>
-        <p class="cta-meta">v2.208 · Windows · ~4 MB · Actualizado recientemente</p>
+        <p class="cta-meta" id="dl-meta" data-i18n="dl_meta">Geometry Dash 2.208</p>
+        <div class="hash-box" id="hash-box" hidden>
+          <span class="lbl">SHA-256</span>
+          <code id="hash-code"></code>
+          <button type="button" class="copy-btn" id="copy-hash" data-i18n="copy">Copiar</button>
+        </div>
       </div>
     </section>
   </main>
@@ -595,15 +849,16 @@
   <!-- ============ FOOTER ============ -->
   <footer>
     <a href="#" class="logo"><span class="logo-mark">M</span><span>MONSTER <small>INPUT BUFFER</small></span></a>
-    <p class="tagline">La herramienta definitiva para jugar Geometry Dash como nunca.</p>
+    <p class="tagline" data-i18n="foot_tag">Un mod de la comunidad para Geometry Dash.</p>
     <div class="foot-links">
-      <a href="#features">Características</a>
-      <a href="#showcase">Por qué</a>
-      <a href="#community">Comunidad</a>
+      <a href="#features" data-i18n="nav_features">Características</a>
+      <a href="#install" data-i18n="nav_install">Instalación</a>
+      <a href="#faq" data-i18n="nav_faq">FAQ</a>
       <a href="https://discord.gg/dsYchZdGvf" target="_blank" rel="noopener">Discord</a>
-      <a href="#download">Descargar</a>
+      <a href="https://github.com/sulawko/monster-input-buffer" target="_blank" rel="noopener">GitHub</a>
+      <a href="#download" data-i18n="nav_download">Descargar</a>
     </div>
-    <p class="disclaimer">
+    <p class="disclaimer" data-i18n-html="disc">
       Monster Input Buffer es un mod no oficial creado por la comunidad.<br />
       Geometry Dash © RobTop Games. Todas las marcas pertenecen a sus respectivos dueños.
     </p>
@@ -677,14 +932,14 @@
     /* ============ Menú móvil ============ */
     const burger = document.querySelector('.nav-toggle');
     const links = document.querySelector('.nav-links');
-    burger.addEventListener('click', () => {
-      burger.classList.toggle('open');
-      links.classList.toggle('open');
-    });
-    links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-      burger.classList.remove('open');
-      links.classList.remove('open');
-    }));
+    const setMenu = (open) => {
+      burger.classList.toggle('open', open);
+      links.classList.toggle('open', open);
+      burger.setAttribute('aria-expanded', String(open));
+    };
+    burger.addEventListener('click', () => setMenu(!links.classList.contains('open')));
+    links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setMenu(false)));
+    window.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
 
     /* ============ Reveal al hacer scroll ============ */
     const io = new IntersectionObserver((entries) => {
@@ -695,11 +950,14 @@
     document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
     /* ============ Contadores animados ============ */
+    // El HTML ya trae el valor final; solo se anima si el navegador lo permite.
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const cio = new IntersectionObserver((entries) => {
       entries.forEach(e => {
         if (!e.isIntersecting) return;
         const el = e.target;
         const target = parseFloat(el.dataset.target);
+        if (reduceMotion || !target) { cio.unobserve(el); return; }
         const suffix = el.dataset.suffix || '';
         const decimals = el.dataset.decimals ? parseInt(el.dataset.decimals, 10) : 0;
         const dur = 1500, start = performance.now();
@@ -735,6 +993,171 @@
       });
       card.addEventListener('mouseleave', () => { card.style.transform = ''; });
     });
+  </script>
+
+  <script>
+    /* ============================================================
+       CONFIGURACIÓN — editá solo este bloque
+       ============================================================ */
+    const CONFIG = {
+      // URL directa del archivo del mod (ej: un Release de GitHub). Vacío = "próximamente".
+      DOWNLOAD_URL: '',
+      // Hash SHA-256 del archivo, para que la gente verifique la descarga. Vacío = se oculta.
+      SHA256: '',
+      // ID de un video de YouTube (ej: 'dQw4w9WgXcQ'). Vacío = la sección de video se oculta.
+      YOUTUBE_ID: '',
+      // Repo para el contador real de descargas (suma de los Releases).
+      REPO: 'sulawko/monster-input-buffer'
+    };
+
+    /* ============================================================
+       IDIOMAS (ES por defecto, EN con el botón)
+       ============================================================ */
+    const EN = {
+      skip: 'Skip to content', gh_label: 'GitHub', menu_label: 'Open menu',
+      nav_features: 'Features', nav_install: 'Install', nav_faq: 'FAQ', nav_community: 'Community', nav_download: 'Download',
+      badge: 'Available for Geometry Dash 2.208',
+      hero_sub: 'A community mod that makes playing feel a lot easier.',
+      hero_copy: 'Forget frustrating timing. Monster Input Buffer shortens the gap between your hand and the game so every jump lands when you meant it to. You focus on the music… and on winning.',
+      cta_hero: 'Download now', cta_feel: 'See how it feels',
+      hero_note: 'Free · For Geometry Dash 2.208 · Made by the community',
+      stat_version: 'Compatible version', stat_free: 'Cost, always free', stat_downloads: 'Downloads', stat_levels: 'Levels to conquer',
+      feat_eyebrow: 'Why Monster Input Buffer', feat_title: 'Designed so you only think about playing.',
+      feat_sub: 'No complicated setup, no jargon. Install, play and feel the difference.',
+      f1_t: 'Precision', f1_p: 'Your clicks register when you mean them to. Fewer jumps lost by a few milliseconds.',
+      f2_t: 'Snappy response', f2_p: 'Your input is translated quickly, without that feeling of fighting the game.',
+      f3_t: 'More flow', f3_p: 'Play more relaxed. The level\'s rhythm leads, not the anxiety about timing.',
+      show_eyebrow: 'The experience', show_title: 'Less fight. More flow.',
+      show_p: 'Forget mashing the button "just in case" and failing anyway. Monster Input Buffer follows your natural rhythm so you reach that state where the level flows and you just follow the music.',
+      chip1: 'No setup', chip2: '2.208 compatible', chip3: 'Light & clean', chip4: 'Made by the community',
+      vid_eyebrow: 'In action', vid_title: 'See how it works.',
+      inst_eyebrow: 'Installation', inst_title: 'Ready in three steps.',
+      inst_sub: 'No hassle. If something goes wrong, drop by the Discord and we\'ll help.',
+      s1_t: 'Download the mod', s1_p: 'Get the latest version from the download button. Always from this page or the official repository.',
+      s2_t: 'Install it', s2_p: 'Follow the instructions that come with the file to add it to your Geometry Dash 2.208.',
+      s3_t: 'Open the game and play', s3_p: 'Launch Geometry Dash, jump into a level and feel the difference from the first try.',
+      req: '<strong>Requirements:</strong> Geometry Dash version 2.208 on PC.',
+      faq_eyebrow: 'FAQ', faq_title: 'What people ask most.',
+      q1: 'Is it safe?',
+      a1: 'It is an unofficial community mod. Download it only from this page or the <a href="https://github.com/sulawko/monster-input-buffer" target="_blank" rel="noopener">official repository</a> and, if the SHA-256 hash is published, check it matches your file. If your antivirus complains, that is common with this kind of file: ask on Discord if in doubt.',
+      q2: 'Is it cheating? Can I use it for records?',
+      a2: 'Monster Input Buffer is an input buffer: it helps with the timing of your clicks. Which mods are accepted for records or rankings is decided by each community, list or moderator, so check their rules before submitting a record. For playing and practicing, no problem.',
+      q3: 'Can I get banned for using it?',
+      a3: 'It is not an official RobTop mod and we do not control third-party rules (lists, servers or tournaments). Use it at your own discretion and check the rules wherever you plan to compete.',
+      q4: 'Is it compatible with other mods?',
+      a4: 'It is made for Geometry Dash 2.208. If you notice a conflict with another mod, tell us which one on Discord or open a report on GitHub and we will look into it.',
+      q5: 'It doesn\'t work, what do I do?',
+      a5: 'Make sure your game is version 2.208 and that you followed the install steps. If it still doesn\'t work, <a href="https://discord.gg/dsYchZdGvf" target="_blank" rel="noopener">write to us on Discord</a> or <a href="https://github.com/sulawko/monster-input-buffer/issues" target="_blank" rel="noopener">open a report on GitHub</a>.',
+      q6: 'Does it cost anything?', a6: 'No. It is free and it will stay that way.',
+      log_eyebrow: 'Versions', log_title: 'What\'s new.', log_first: 'First public release',
+      log1: 'Launch of the mod for Geometry Dash 2.208.', log2: 'Future changes will be posted here and on Discord.',
+      com_eyebrow: 'Community', com_title: 'Join in, try it and tell us.',
+      com_p: 'Questions, suggestions and reports are shared here. Your feedback makes the mod better.',
+      com_discord: 'Join the Discord', com_bug: 'Report a bug',
+      dl_eyebrow: 'Download', dl_title: 'Ready to master the game?',
+      dl_p: 'Free and compatible with Geometry Dash version 2.208.',
+      dl_btn: 'Download Monster Input Buffer', dl_soon: 'Download coming soon', dl_meta: 'Geometry Dash 2.208',
+      dl_meta_soon: 'The download isn\'t available yet. Join the Discord to be the first to know when it is.',
+      copy: 'Copy', copied: 'Copied!',
+      foot_tag: 'A community mod for Geometry Dash.',
+      disc: 'Monster Input Buffer is an unofficial mod made by the community.<br />Geometry Dash © RobTop Games. All trademarks belong to their respective owners.'
+    };
+    const ES_DL = {
+      dl_btn: 'Descargar Monster Input Buffer', dl_soon: 'Descarga próximamente',
+      dl_meta: 'Geometry Dash 2.208',
+      dl_meta_soon: 'La descarga todavía no está disponible. Unite al Discord para enterarte primero cuando salga.',
+      copy: 'Copiar', copied: '¡Copiado!'
+    };
+
+    const i18nEls = [...document.querySelectorAll('[data-i18n], [data-i18n-html], [data-i18n-attr]')];
+    const ES = {};
+    i18nEls.forEach(el => {
+      if (el.dataset.i18n) ES[el.dataset.i18n] = ES[el.dataset.i18n] ?? el.textContent.trim().replace(/\s+/g, ' ');
+      if (el.dataset.i18nHtml) ES[el.dataset.i18nHtml] = ES[el.dataset.i18nHtml] ?? el.innerHTML.trim();
+      if (el.dataset.i18nAttr) {
+        const [attr, key] = el.dataset.i18nAttr.split(':');
+        ES[key] = el.getAttribute(attr);
+      }
+    });
+    Object.assign(ES, ES_DL);
+
+    let lang = 'es';
+    const dict = () => (lang === 'en' ? EN : ES);
+    const t = (k) => dict()[k] ?? ES[k] ?? k;
+
+    function applyLang(l) {
+      lang = l;
+      document.documentElement.lang = l;
+      i18nEls.forEach(el => {
+        if (el.id === 'dl-label' || el.id === 'dl-meta') return; // los maneja renderDownload()
+        if (el.dataset.i18n) el.textContent = t(el.dataset.i18n);
+        if (el.dataset.i18nHtml) el.innerHTML = t(el.dataset.i18nHtml);
+        if (el.dataset.i18nAttr) {
+          const [attr, key] = el.dataset.i18nAttr.split(':');
+          el.setAttribute(attr, t(key));
+        }
+      });
+      document.getElementById('lang-toggle').textContent = l === 'en' ? 'ES' : 'EN';
+      document.title = l === 'en' ? 'Monster Input Buffer — Geometry Dash 2.208 mod' : 'Monster Input Buffer — Geometry Dash 2.208';
+      try { localStorage.setItem('mib-lang', l); } catch (_) {}
+      renderDownload();
+    }
+
+    /* ============ Descarga: activa o "próximamente" ============ */
+    function renderDownload() {
+      const btn = document.getElementById('dl-btn');
+      const label = document.getElementById('dl-label');
+      const meta = document.getElementById('dl-meta');
+      if (CONFIG.DOWNLOAD_URL) {
+        btn.href = CONFIG.DOWNLOAD_URL;
+        btn.setAttribute('download', '');
+        btn.removeAttribute('aria-disabled');
+        btn.classList.remove('is-soon');
+        label.textContent = t('dl_btn');
+        meta.textContent = t('dl_meta');
+      } else {
+        btn.href = 'https://discord.gg/dsYchZdGvf';
+        btn.target = '_blank'; btn.rel = 'noopener';
+        btn.removeAttribute('download');
+        btn.classList.add('is-soon');
+        label.textContent = t('dl_soon');
+        meta.textContent = t('dl_meta_soon');
+      }
+    }
+
+    /* Hash, video y contador real de descargas */
+    if (CONFIG.SHA256) {
+      document.getElementById('hash-box').hidden = false;
+      document.getElementById('hash-code').textContent = CONFIG.SHA256;
+      const cb = document.getElementById('copy-hash');
+      cb.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(CONFIG.SHA256); cb.textContent = t('copied'); }
+        catch (_) { cb.textContent = 'Ctrl+C'; }
+        setTimeout(() => { cb.textContent = t('copy'); }, 1800);
+      });
+    }
+    if (CONFIG.YOUTUBE_ID) {
+      const slot = document.getElementById('video-slot');
+      slot.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(CONFIG.YOUTUBE_ID) +
+        '" title="Monster Input Buffer" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
+      document.getElementById('video').hidden = false;
+    }
+    fetch('https://api.github.com/repos/' + CONFIG.REPO + '/releases')
+      .then(r => (r.ok ? r.json() : []))
+      .then(rels => {
+        const total = rels.reduce((s, r) => s + (r.assets || []).reduce((a, x) => a + (x.download_count || 0), 0), 0);
+        if (total > 0) {
+          const box = document.getElementById('dl-stat'); const num = document.getElementById('dl-count');
+          num.textContent = total.toLocaleString(); box.hidden = false;
+        }
+      })
+      .catch(() => {});
+
+    /* Idioma inicial: guardado > navegador */
+    let startLang = 'es';
+    try { startLang = localStorage.getItem('mib-lang') || ((navigator.language || 'es').toLowerCase().startsWith('es') ? 'es' : 'en'); } catch (_) {}
+    document.getElementById('lang-toggle').addEventListener('click', () => applyLang(lang === 'es' ? 'en' : 'es'));
+    applyLang(startLang);
   </script>
 </body>
 </html>
