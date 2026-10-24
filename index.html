@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -1087,7 +1087,7 @@
     });
     Object.assign(ES, ES_DL);
 
-    let lang = 'es';
+    let lang = 'en';
     const dict = () => (lang === 'en' ? EN : ES);
     const t = (k) => dict()[k] ?? ES[k] ?? k;
 
@@ -1104,8 +1104,7 @@
         }
       });
       document.getElementById('lang-toggle').textContent = l === 'en' ? 'ES' : 'EN';
-      document.title = l === 'en' ? 'Monster Input Buffer — Geometry Dash 2.208 mod' : 'Monster Input Buffer — Geometry Dash 2.208';
-      try { localStorage.setItem('mib-lang', l); } catch (_) {}
+      document.title = 'Monster Input Buffer — ' + (l === 'en' ? 'Never lose a run to an early click' : 'No pierdas una run por un click temprano');
       renderDownload();
     }
 
@@ -1160,9 +1159,9 @@
       .catch(() => {});
 
     /* Idioma inicial: guardado > navegador */
-    let startLang = 'es';
-    try { startLang = localStorage.getItem('mib-lang') || ((navigator.language || 'es').toLowerCase().startsWith('es') ? 'es' : 'en'); } catch (_) {}
-    document.getElementById('lang-toggle').addEventListener('click', () => applyLang(lang === 'es' ? 'en' : 'es'));
+    let startLang = 'en';
+    try { startLang = localStorage.getItem('mib-lang-choice') || 'en'; } catch (_) {}
+    document.getElementById('lang-toggle').addEventListener('click', () => { const n = lang === 'es' ? 'en' : 'es'; applyLang(n); try { localStorage.setItem('mib-lang-choice', n); } catch (_) {} });
     applyLang(startLang);
   </script>
 </body>
