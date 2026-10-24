@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monster Input Buffer — Geometry Dash 2.208</title>
+  <meta name="description" content="Monster Input Buffer: la herramienta definitiva para jugar Geometry Dash como nunca. Precisión total, reacción instantánea y fluidez absoluta." />
+  <meta name="theme-color" content="#0a0714" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0714'/%3E%3Cpath d='M8 24V8l16 16V8' stroke='%23a855f7' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+
+  <!-- Fuentes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ============================================================
+       VARIABLES
+    ============================================================ */
+    :root {
+      --bg: #050508;
+      --bg-2: #0a0a12;
+      --surface: #0e0e18;
+      --surface-2: #14141f;
+      --border: rgba(168, 85, 247, 0.16);
+      --border-strong: rgba(168, 85, 247, 0.42);
+      --purple: #a855f7;
+      --purple-2: #7c3aed;
+      --purple-3: #c084fc;
+      --neon: #b026ff;
+      --text: #f5f3ff;
+      --muted: #9b93b4;
+      --font-display: "Space Grotesk", system-ui, -apple-system, sans-serif;
+      --font-body: "Inter", system-ui, -apple-system, sans-serif;
+      --radius: 18px;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* ============================================================
+       BASE
+    ============================================================ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    a { color: inherit; }
+    ::selection { background: rgba(168, 85, 247, 0.4); color: #fff; }
+
+    /* ============================================================
+       FONDO: partículas + brillo del cursor
+    ============================================================ */
+    #bg {
+      position: fixed; inset: 0; z-index: 0;
+      pointer-events: none; opacity: 0.9;
+    }
+    .cursor-glow {
+      position: fixed; top: 0; left: 0; z-index: 0;
+      width: 560px; height: 560px; pointer-events: none;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.10), transparent 62%);
+      will-change: transform;
+    }
+    @media (hover: none) { .cursor-glow { display: none; } }
+
+    /* ============================================================
+       NAVBAR
+    ============================================================ */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px clamp(20px, 5vw, 60px);
+      border-bottom: 1px solid transparent;
+      transition: background 0.4s, border-color 0.4s, padding 0.4s, backdrop-filter 0.4s;
+    }
+    .nav.scrolled {
+      background: rgba(5, 5, 8, 0.72);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+      padding-top: 14px; padding-bottom: 14px;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 11px;
+      font-family: var(--font-display); font-weight: 700;
+      letter-spacing: 0.06em; font-size: 1.02rem; text-decoration: none;
+    }
+    .logo-mark {
+      width: 30px; height: 30px; display: grid; place-items: center;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--purple), var(--purple-2));
+      box-shadow: 0 0 18px rgba(168, 85, 247, 0.55);
+      font-size: 15px; font-weight: 700; color: #fff;
+    }
+    .logo small { color: var(--muted); font-weight: 500; letter-spacing: 0.14em; }
+    .nav-links {
+      display: flex; align-items: center; gap: 34px; list-style: none;
+    }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: 14px;
+      position: relative; transition: color 0.3s;
+    }
+    .nav-links a::after {
+      content: ""; position: absolute; left: 0; bottom: -6px;
+      width: 0; height: 1px; background: linear-gradient(90deg, var(--purple), var(--purple-3));
+      transition: width 0.3s var(--ease);
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a:hover::after { width: 100%; }
+
+    .nav-toggle {
+      display: none; width: 44px; height: 44px;
+      background: none; border: none; cursor: pointer;
+      place-items: center; z-index: 101;
+    }
+    .nav-toggle span {
+      display: block; width: 24px; height: 2px; background: var(--text);
+      border-radius: 2px; position: relative; transition: 0.3s;
+    }
+    .nav-toggle span::before, .nav-toggle span::after {
+      content: ""; position: absolute; left: 0; width: 24px; height: 2px;
+      background: var(--text); border-radius: 2px; transition: 0.3s;
+    }
+    .nav-toggle span::before { top: -7px; }
+    .nav-toggle span::after { top: 7px; }
+    .nav-toggle.open span { background: transparent; }
+    .nav-toggle.open span::before { top: 0; transform: rotate(45deg); }
+    .nav-toggle.open span::after { top: 0; transform: rotate(-45deg); }
+
+    /* ============================================================
+       BOTONES
+    ============================================================ */
+    .btn {
+      position: relative; display: inline-flex; align-items: center; gap: 10px;
+      font-family: var(--font-display); font-weight: 600; letter-spacing: 0.02em;
+      border-radius: 999px; cursor: pointer; text-decoration: none;
+      border: 1px solid transparent; overflow: hidden;
+      transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease),
+                  background 0.35s, border-color 0.35s;
+    }
+    .btn-sm { padding: 10px 20px; font-size: 13px; }
+    .btn-lg { padding: 18px 36px; font-size: 17px; }
+
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(135deg, var(--purple) 0%, var(--purple-2) 100%);
+      box-shadow: 0 12px 34px -8px rgba(168, 85, 247, 0.6),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    }
+    .btn-primary::before {
+      content: ""; position: absolute; top: 0; left: -120%;
+      width: 55%; height: 100%;
+      background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+      transform: skewX(-20deg); transition: left 0.65s var(--ease);
+    }
+    .btn-primary:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 18px 44px -8px rgba(168, 85, 247, 0.8),
+                  0 0 0 1px rgba(192, 132, 252, 0.3);
+    }
+    .btn-primary:hover::before { left: 130%; }
+
+    .btn-ghost {
+      color: var(--text); border-color: rgba(168, 85, 247, 0.38);
+      background: rgba(168, 85, 247, 0.06);
+    }
+    .btn-ghost:hover {
+      border-color: var(--purple-3); background: rgba(168, 85, 247, 0.14);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 34px -14px rgba(168, 85, 247, 0.55);
+    }
+
+    /* Halo pulsante del CTA principal */
+    .btn-pulse { animation: btnPulse 2.8s infinite; }
+    @keyframes btnPulse {
+      0%, 100% { box-shadow: 0 12px 40px -6px rgba(168, 85, 247, 0.6), 0 0 0 0 rgba(168, 85, 247, 0.45); }
+      50%      { box-shadow: 0 12px 40px -6px rgba(168, 85, 247, 0.85), 0 0 0 16px rgba(168, 85, 247, 0); }
+    }
+
+    /* ============================================================
+       HERO
+    ============================================================ */
+    .hero {
+      position: relative; z-index: 2; min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 130px 24px 90px; overflow: hidden;
+    }
+    .hero::before {
+      content: ""; position: absolute; inset: 0; z-index: -1;
+      background-image:
+        linear-gradient(rgba(168, 85, 247, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(168, 85, 247, 0.06) 1px, transparent 1px);
+      background-size: 56px 56px;
+      -webkit-mask-image: radial-gradient(ellipse 80% 62% at 50% 42%, #000 25%, transparent 74%);
+      mask-image: radial-gradient(ellipse 80% 62% at 50% 42%, #000 25%, transparent 74%);
+    }
+    .orb { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.5; z-index: -1; }
+    .orb-1 { width: 520px; height: 520px; background: rgba(124, 58, 237, 0.32); top: -12%; left: -6%; animation: float1 16s ease-in-out infinite; }
+    .orb-2 { width: 440px; height: 440px; background: rgba(168, 85, 247, 0.28); bottom: -16%; right: -6%; animation: float2 20s ease-in-out infinite; }
+    @keyframes float1 { 50% { transform: translate(44px, 34px) scale(1.12); } }
+    @keyframes float2 { 50% { transform: translate(-34px, -22px) scale(1.08); } }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 9px;
+      padding: 8px 16px; border-radius: 999px;
+      border: 1px solid var(--border); background: rgba(168, 85, 247, 0.08);
+      color: var(--purple-3); font-size: 13px; letter-spacing: 0.02em; margin-bottom: 30px;
+    }
+    .badge .dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--neon); box-shadow: 0 0 12px var(--neon); animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 50% { opacity: 0.35; } }
+
+    .hero-title {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: clamp(2.7rem, 9.5vw, 7.8rem);
+      line-height: 0.94; letter-spacing: -0.02em; text-transform: uppercase;
+    }
+    .hero-title .line { display: block; }
+    .hero-title .line-1 {
+      background: linear-gradient(180deg, #ffffff 0%, #e9d5ff 60%, #c084fc 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      filter: drop-shadow(0 0 34px rgba(168, 85, 247, 0.35));
+    }
+    .hero-title .line-2 {
+      background: linear-gradient(100deg, #c084fc 0%, #a855f7 45%, #7c3aed 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      filter: drop-shadow(0 0 40px rgba(168, 85, 247, 0.55));
+    }
+
+    .hero-sub {
+      font-size: clamp(1.12rem, 2.4vw, 1.5rem); font-weight: 500;
+      max-width: 720px; margin: 28px auto 0; color: var(--text);
+    }
+    .hero-copy {
+      color: var(--muted); max-width: 620px; margin: 18px auto 0;
+      font-size: clamp(0.95rem, 1.5vw, 1.06rem); line-height: 1.75;
+    }
+    .hero-actions {
+      display: flex; gap: 16px; margin-top: 42px; flex-wrap: wrap; justify-content: center;
+    }
+    .hero-note { margin-top: 24px; font-size: 13px; color: var(--muted); letter-spacing: 0.02em; }
+
+    .scroll-hint {
+      position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      color: var(--muted); font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    }
+    .scroll-hint .chev { width: 20px; height: 20px; border-right: 2px solid var(--purple); border-bottom: 2px solid var(--purple); transform: rotate(45deg); animation: chev 1.8s infinite; }
+    @keyframes chev { 0%,100% { transform: rotate(45deg) translate(0,0); opacity: .4; } 50% { transform: rotate(45deg) translate(6px,6px); opacity: 1; } }
+
+    /* ============================================================
+       STATS
+    ============================================================ */
+    .stats {
+      position: relative; z-index: 2;
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      background: rgba(10, 10, 18, 0.5);
+    }
+    .stats-inner {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+      max-width: 1100px; margin: 0 auto; padding: 44px 24px;
+    }
+    .stat { text-align: center; }
+    .stat-value {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: clamp(1.8rem, 4vw, 2.7rem); line-height: 1;
+      background: linear-gradient(180deg, #fff, #c084fc);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .stat-label { color: var(--muted); font-size: 12px; margin-top: 8px; letter-spacing: 0.12em; text-transform: uppercase; }
+
+    /* ============================================================
+       SECCIONES GENÉRICAS
+    ============================================================ */
+    .section { position: relative; z-index: 2; padding: 120px 24px; max-width: 1200px; margin: 0 auto; }
+    .section-head { text-align: center; max-width: 660px; margin: 0 auto 64px; }
+    .eyebrow {
+      color: var(--purple-3); font-size: 12px; letter-spacing: 0.2em;
+      text-transform: uppercase; font-weight: 600; margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: clamp(2rem, 5vw, 3.1rem); line-height: 1.05; letter-spacing: -0.02em;
+    }
+    .section-sub { color: var(--muted); margin-top: 18px; line-height: 1.7; font-size: 1.02rem; }
+
+    /* ============================================================
+       FEATURES
+    ============================================================ */
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; perspective: 1100px; }
+    .card {
+      position: relative; padding: 36px 30px; overflow: hidden;
+      background: linear-gradient(180deg, rgba(22, 22, 34, 0.55), rgba(10, 10, 18, 0.55));
+      border: 1px solid var(--border); border-radius: var(--radius);
+      transition: border-color 0.4s, box-shadow 0.4s;
+      will-change: transform;
+    }
+    .card::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--purple), transparent);
+      opacity: 0; transition: opacity 0.4s;
+    }
+    .card:hover { border-color: var(--border-strong); box-shadow: 0 26px 54px -22px rgba(168, 85, 247, 0.4); }
+    .card:hover::before { opacity: 1; }
+    .card-icon {
+      width: 56px; height: 56px; display: grid; place-items: center; margin-bottom: 24px;
+      border-radius: 14px; border: 1px solid var(--border); color: var(--purple-3);
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(124, 58, 237, 0.1));
+      transition: transform 0.4s var(--ease), box-shadow 0.4s;
+    }
+    .card:hover .card-icon { transform: translateY(-4px); box-shadow: 0 14px 32px -10px rgba(168, 85, 247, 0.6); }
+    .card h3 { font-family: var(--font-display); font-size: 1.32rem; margin-bottom: 10px; letter-spacing: -0.01em; }
+    .card p { color: var(--muted); line-height: 1.7; font-size: 0.96rem; }
+
+    /* ============================================================
+       SHOWCASE
+    ============================================================ */
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+    .split-copy p { color: var(--muted); margin-top: 20px; line-height: 1.75; }
+    .feature-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+    .chip {
+      padding: 9px 16px; border-radius: 999px; border: 1px solid var(--border);
+      background: rgba(168, 85, 247, 0.06); color: var(--purple-3); font-size: 13px;
+      transition: border-color 0.3s, background 0.3s, transform 0.3s var(--ease);
+    }
+    .chip:hover { border-color: var(--border-strong); background: rgba(168, 85, 247, 0.14); transform: translateY(-2px); }
+
+    .visual {
+      position: relative; height: 320px; display: flex; align-items: center; justify-content: center;
+      border: 1px solid var(--border); border-radius: 26px; overflow: hidden;
+      background: radial-gradient(120% 120% at 50% 0%, rgba(124, 58, 237, 0.18), rgba(10, 10, 18, 0.5) 60%);
+    }
+    .visual::before {
+      content: ""; position: absolute; width: 280px; height: 280px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.5), transparent 70%);
+      filter: blur(30px); animation: pulse 4s ease-in-out infinite;
+    }
+    .bars { position: relative; display: flex; gap: 6px; align-items: flex-end; height: 150px; z-index: 1; }
+    .bar {
+      width: 5px; height: 40%; border-radius: 4px;
+      background: linear-gradient(180deg, var(--purple-3), var(--purple-2));
+      box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+      transform-origin: bottom; animation: eq 1.5s ease-in-out infinite;
+    }
+    @keyframes eq { 0%, 100% { transform: scaleY(0.35); } 50% { transform: scaleY(1); } }
+
+    /* ============================================================
+       TESTIMONIOS
+    ============================================================ */
+    .quote { color: var(--muted); line-height: 1.75; font-size: 0.98rem; }
+    .person { display: flex; align-items: center; gap: 14px; margin-top: 26px; }
+    .avatar {
+      width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+      font-family: var(--font-display); font-weight: 700; font-size: 15px; color: #fff;
+      background: linear-gradient(135deg, var(--purple), var(--purple-2));
+      box-shadow: 0 0 18px rgba(168, 85, 247, 0.4); flex-shrink: 0;
+    }
+    .person .name { font-weight: 600; font-size: 0.95rem; }
+    .person .role { color: var(--muted); font-size: 12px; letter-spacing: 0.04em; }
+
+    /* ============================================================
+       CTA FINAL
+    ============================================================ */
+    .cta-card {
+      position: relative; text-align: center; padding: 76px 40px; overflow: hidden;
+      border-radius: 30px; border: 1px solid rgba(168, 85, 247, 0.35);
+      background: radial-gradient(120% 130% at 50% 0%, rgba(124, 58, 237, 0.26), rgba(10, 10, 18, 0.6) 60%);
+      box-shadow: 0 34px 90px -34px rgba(168, 85, 247, 0.5);
+    }
+    .cta-card h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(2rem, 5vw, 3.4rem); letter-spacing: -0.02em; line-height: 1.05; }
+    .cta-card p { color: var(--muted); max-width: 520px; margin: 20px auto 0; line-height: 1.7; }
+    .cta-actions { display: flex; gap: 16px; margin-top: 40px; flex-wrap: wrap; justify-content: center; }
+    .cta-meta { margin-top: 26px; font-size: 13px; color: var(--muted); }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    footer {
+      position: relative; z-index: 2; border-top: 1px solid var(--border);
+      padding: 54px 24px; text-align: center;
+    }
+    footer .logo { justify-content: center; margin-bottom: 16px; }
+    footer .tagline { color: var(--muted); font-size: 14px; max-width: 420px; margin: 0 auto 26px; }
+    .foot-links { display: flex; gap: 26px; justify-content: center; flex-wrap: wrap; }
+    .foot-links a { color: var(--muted); font-size: 13px; text-decoration: none; transition: color 0.3s; }
+    .foot-links a:hover { color: var(--purple-3); }
+    .disclaimer { margin-top: 30px; color: #55506a; font-size: 12px; line-height: 1.7; }
+
+    /* ============================================================
+       ANIMACIONES DE ENTRADA
+    ============================================================ */
+    .rise { opacity: 0; transform: translateY(26px); filter: blur(8px); animation: rise 0.9s var(--ease) forwards; }
+    @keyframes rise { to { opacity: 1; transform: none; filter: none; } }
+    .d1 { animation-delay: 0.05s; } .d2 { animation-delay: 0.15s; } .d3 { animation-delay: 0.28s; }
+    .d4 { animation-delay: 0.42s; } .d5 { animation-delay: 0.56s; } .d6 { animation-delay: 0.72s; }
+
+    /* Reveal al hacer scroll */
+    .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); transition-delay: var(--d, 0s); }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 900px) {
+      .grid-3 { grid-template-columns: 1fr; }
+      .split { grid-template-columns: 1fr; gap: 40px; }
+      .stats-inner { grid-template-columns: repeat(2, 1fr); gap: 36px 16px; }
+      .visual { height: 240px; }
+    }
+    @media (max-width: 820px) {
+      .nav-toggle { display: grid; }
+      .nav-links {
+        position: fixed; top: 0; right: 0; z-index: 99;
+        height: 100vh; width: min(320px, 82vw);
+        flex-direction: column; justify-content: center; gap: 30px;
+        padding: 40px; background: rgba(8, 8, 14, 0.94);
+        backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+        border-left: 1px solid var(--border);
+        transform: translateX(100%); transition: transform 0.45s var(--ease);
+      }
+      .nav-links.open { transform: translateX(0); }
+      .nav-links a { font-size: 22px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; transition-duration: 0.001s !important; }
+      html { scroll-behavior: auto; }
+      .reveal, .rise { opacity: 1; transform: none; filter: none; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <div class="cursor-glow" aria-hidden="true"></div>
+
+  <!-- ============ NAVBAR ============ -->
+  <header class="nav">
+    <a href="#" class="logo">
+      <span class="logo-mark">M</span>
+      <span>MONSTER <small>INPUT BUFFER</small></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">Características</a></li>
+      <li><a href="#showcase">Por qué</a></li>
+      <li><a href="#community">Comunidad</a></li>
+      <li><a href="#download" class="btn btn-primary btn-sm">Descargar</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="Abrir menú"><span></span></button>
+  </header>
+
+  <main>
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+
+      <span class="badge rise d1"><span class="dot"></span> Disponible para Geometry Dash 2.208</span>
+      <h1 class="hero-title rise d2">
+        <span class="line line-1">Monster</span>
+        <span class="line line-2">Input Buffer</span>
+      </h1>
+      <p class="hero-sub rise d3">La herramienta definitiva para que jugar se sienta imposiblemente fácil.</p>
+      <p class="hero-copy rise d4">
+        Olvidate del timing frustrante. Monster Input Buffer borra la fricción entre tu mano y el juego
+        para que cada salto caiga exacto, sin esfuerzo. Vos concentrate en la música… y en ganar.
+      </p>
+      <div class="hero-actions rise d5">
+        <a href="#download" class="btn btn-primary btn-lg btn-pulse">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
+          Descargar ahora
+        </a>
+        <a href="#showcase" class="btn btn-ghost btn-lg">Ver cómo se siente</a>
+      </div>
+      <p class="hero-note rise d6">Gratis · Windows · v2.208 · Instalación en un clic</p>
+
+      <div class="scroll-hint" aria-hidden="true"><span class="chev"></span></div>
+    </section>
+
+    <!-- ============ STATS ============ -->
+    <section class="stats">
+      <div class="stats-inner">
+        <div class="stat reveal"><div class="stat-value" data-target="100" data-suffix="%">0%</div><div class="stat-label">Precisión en tus saltos</div></div>
+        <div class="stat reveal" style="--d:.08s"><div class="stat-value" data-target="10" data-suffix="K+">0</div><div class="stat-label">Jugadores lo usan</div></div>
+        <div class="stat reveal" style="--d:.16s"><div class="stat-value" data-target="2.208" data-decimals="3">0</div><div class="stat-label">Versión compatible</div></div>
+        <div class="stat reveal" style="--d:.24s"><div class="stat-value">∞</div><div class="stat-label">Niveles por dominar</div></div>
+      </div>
+    </section>
+
+    <!-- ============ FEATURES ============ -->
+    <section class="section" id="features">
+      <div class="section-head reveal">
+        <div class="eyebrow">Por qué Monster Input Buffer</div>
+        <h2 class="section-title">Diseñado para que solo pienses en jugar.</h2>
+        <p class="section-sub">Sin configuraciones complicadas, sin tecnicismos. Instalás, jugás y sentís la diferencia desde el primer intento.</p>
+      </div>
+      <div class="grid-3">
+        <article class="card tilt reveal">
+          <div class="card-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 12l4-4"/><path d="M12 12l-4-4"/><circle cx="12" cy="12" r="2.2"/></svg>
+          </div>
+          <h3>Precisión quirúrgica</h3>
+          <p>Cada click cae donde debe, exactamente cuando debe. Se acabaron los saltos que se pierden por milésimas.</p>
+        </article>
+        <article class="card tilt reveal" style="--d:.1s">
+          <div class="card-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg>
+          </div>
+          <h3>Reacción instantánea</h3>
+          <p>Tu input se traduce al instante, sin fricción entre tu mano y la pantalla. Reaccionás más rápido sin esforzarte.</p>
+        </article>
+        <article class="card tilt reveal" style="--d:.2s">
+          <div class="card-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12c2.5-3 5-3 7.5 0s5 3 7.5 0 3-2 5 0"/><path d="M2 18c2.5-3 5-3 7.5 0s5 3 7.5 0 3-2 5 0"/></svg>
+          </div>
+          <h3>Fluidez total</h3>
+          <p>Jugá más relajado y más rápido. El juego por fin se siente como debería haberse sentido siempre.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ SHOWCASE ============ -->
+    <section class="section" id="showcase">
+      <div class="split">
+        <div class="split-copy reveal">
+          <div class="eyebrow">La experiencia</div>
+          <h2 class="section-title">Menos pelea. Más flow.</h2>
+          <p>
+            Olvidate de apretar el botón "por las dudas" y fallar igual. Monster Input Buffer
+            convierte tu ritmo natural en precisión perfecta, para que entres en ese estado donde
+            el nivel fluye y vos solo seguís la música.
+          </p>
+          <div class="feature-chips">
+            <span class="chip">Sin configuración</span>
+            <span class="chip">Compatible 2.208</span>
+            <span class="chip">Ligero y limpio</span>
+            <span class="chip">Hecho por la comunidad</span>
+          </div>
+        </div>
+        <div class="visual reveal" style="--d:.15s">
+          <div class="bars" id="bars"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TESTIMONIOS ============ -->
+    <section class="section" id="community">
+      <div class="section-head reveal">
+        <div class="eyebrow">Comunidad</div>
+        <h2 class="section-title">Lo que dicen los jugadores.</h2>
+      </div>
+      <div class="grid-3">
+        <article class="card reveal">
+          <p class="quote">"Antes fallaba saltos que juraba haber tocado bien. Ahora siento que el juego me escucha. Es otro mundo."</p>
+          <div class="person"><div class="avatar">P</div><div><div class="name">@pixelPuncher</div><div class="role">Demon slayer</div></div></div>
+        </article>
+        <article class="card reveal" style="--d:.1s">
+          <p class="quote">"Instalé, jugué y no pude volver atrás. La diferencia es tan grande que parece trampa, pero no lo es."</p>
+          <div class="person"><div class="avatar">S</div><div><div class="name">@speedrunnerGD</div><div class="role">Speedrunner</div></div></div>
+        </article>
+        <article class="card reveal" style="--d:.2s">
+          <p class="quote">"Limpio, rápido y sin drama. Justo lo que todo mod debería ser. Gracias por existir."</p>
+          <div class="person"><div class="avatar">M</div><div><div class="name">@mapMaker</div><div class="role">Creador de niveles</div></div></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ CTA FINAL ============ -->
+    <section class="section" id="download">
+      <div class="cta-card reveal">
+        <div class="eyebrow">Descarga</div>
+        <h2>Listo para dominar el juego?</h2>
+        <p>Un clic y estás jugando como nunca. Gratis, seguro y compatible con la versión 2.208.</p>
+        <div class="cta-actions">
+          <!-- ⬇⬇ REEMPLAZÁ el href por la URL real del archivo de descarga ⬇⬇ -->
+          <a href="#" class="btn btn-primary btn-lg btn-pulse">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
+            Descargar Monster Input Buffer
+          </a>
+          <a href="https://discord.gg/dsYchZdGvf" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">Unirse al Discord</a>
+        </div>
+        <p class="cta-meta">v2.208 · Windows · ~4 MB · Actualizado recientemente</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer>
+    <a href="#" class="logo"><span class="logo-mark">M</span><span>MONSTER <small>INPUT BUFFER</small></span></a>
+    <p class="tagline">La herramienta definitiva para jugar Geometry Dash como nunca.</p>
+    <div class="foot-links">
+      <a href="#features">Características</a>
+      <a href="#showcase">Por qué</a>
+      <a href="#community">Comunidad</a>
+      <a href="https://discord.gg/dsYchZdGvf" target="_blank" rel="noopener">Discord</a>
+      <a href="#download">Descargar</a>
+    </div>
+    <p class="disclaimer">
+      Monster Input Buffer es un mod no oficial creado por la comunidad.<br />
+      Geometry Dash © RobTop Games. Todas las marcas pertenecen a sus respectivos dueños.
+    </p>
+  </footer>
+
+  <script>
+    /* ============ Fondo de partículas ============ */
+    const canvas = document.getElementById('bg');
+    const ctx = canvas.getContext('2d');
+    const COLORS = ['#a855f7', '#c084fc', '#7c3aed', '#b026ff'];
+    let w, h, particles = [];
+
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+    function spawn(anywhere) {
+      return {
+        x: Math.random() * w,
+        y: anywhere ? Math.random() * h : h + 20,
+        r: Math.random() * 2 + 0.5,
+        vy: -(Math.random() * 0.4 + 0.1),
+        vx: (Math.random() - 0.5) * 0.15,
+        a: Math.random() * 0.5 + 0.15,
+        phase: Math.random() * Math.PI * 2,
+        speed: Math.random() * 0.02 + 0.005,
+        color: COLORS[(Math.random() * COLORS.length) | 0]
+      };
+    }
+    function initParticles() {
+      const count = Math.min(80, Math.floor(window.innerWidth / 18));
+      particles = Array.from({ length: count }, () => spawn(true));
+    }
+    function tick() {
+      ctx.clearRect(0, 0, w, h);
+      for (const p of particles) {
+        p.x += p.vx; p.y += p.vy; p.phase += p.speed;
+        if (p.y < -20) { Object.assign(p, spawn(false)); p.y = h + 20; }
+        if (p.x < -20) p.x = w + 20;
+        if (p.x > w + 20) p.x = -20;
+        ctx.globalAlpha = p.a * (0.6 + 0.4 * Math.sin(p.phase));
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(tick);
+    }
+    window.addEventListener('resize', resize);
+    resize(); initParticles(); tick();
+
+    /* ============ Brillo que sigue al cursor ============ */
+    const glow = document.querySelector('.cursor-glow');
+    if (glow && window.matchMedia('(hover: hover)').matches) {
+      let gx = innerWidth / 2, gy = innerHeight / 2, tx = gx, ty = gy;
+      window.addEventListener('mousemove', e => { tx = e.clientX; ty = e.clientY; });
+      (function follow() {
+        gx += (tx - gx) * 0.12; gy += (ty - gy) * 0.12;
+        glow.style.transform = `translate(${gx - 280}px, ${gy - 280}px)`;
+        requestAnimationFrame(follow);
+      })();
+    }
+
+    /* ============ Navbar al hacer scroll ============ */
+    const nav = document.querySelector('.nav');
+    const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 30);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    /* ============ Menú móvil ============ */
+    const burger = document.querySelector('.nav-toggle');
+    const links = document.querySelector('.nav-links');
+    burger.addEventListener('click', () => {
+      burger.classList.toggle('open');
+      links.classList.toggle('open');
+    });
+    links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      burger.classList.remove('open');
+      links.classList.remove('open');
+    }));
+
+    /* ============ Reveal al hacer scroll ============ */
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    /* ============ Contadores animados ============ */
+    const cio = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        const el = e.target;
+        const target = parseFloat(el.dataset.target);
+        const suffix = el.dataset.suffix || '';
+        const decimals = el.dataset.decimals ? parseInt(el.dataset.decimals, 10) : 0;
+        const dur = 1500, start = performance.now();
+        (function step(now) {
+          const p = Math.min((now - start) / dur, 1);
+          const eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = (target * eased).toFixed(decimals) + suffix;
+          if (p < 1) requestAnimationFrame(step);
+        })(start);
+        cio.unobserve(el);
+      });
+    }, { threshold: 0.4 });
+    document.querySelectorAll('[data-target]').forEach(el => cio.observe(el));
+
+    /* ============ Barras del visual (ecualizador) ============ */
+    const barsEl = document.getElementById('bars');
+    for (let i = 0; i < 32; i++) {
+      const b = document.createElement('span');
+      b.className = 'bar';
+      b.style.height = (22 + Math.abs(Math.sin(i * 0.35)) * 72) + '%';
+      b.style.animationDelay = (i * 0.055) + 's';
+      b.style.animationDuration = (1.2 + Math.random() * 0.7) + 's';
+      barsEl.appendChild(b);
+    }
+
+    /* ============ Tilt 3D en las tarjetas ============ */
+    document.querySelectorAll('.tilt').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5;
+        const y = (e.clientY - r.top) / r.height - 0.5;
+        card.style.transform = `translateY(-8px) rotateX(${(-y * 5).toFixed(2)}deg) rotateY(${(x * 5).toFixed(2)}deg)`;
+      });
+      card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+    });
+  </script>
+</body>
+</html>
