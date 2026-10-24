@@ -1,51 +1,51 @@
 <p align="center">
-  <img src="apple-touch-icon.png" width="96" alt="Monster Input Buffer">
+  <img src="logo.png" width="110" alt="Monster Input Buffer">
 </p>
 
 <h1 align="center">Monster Input Buffer</h1>
 
 <p align="center">
-  Mod de <b>Geode</b> para Geometry Dash 2.208 que corrige tus clicks "por las dudas".<br>
-  Hecho por <b>SuLawko</b>.
+  A <b>Geode</b> mod for Geometry Dash 2.208 that fixes your clicks "just in case".<br>
+  Made by <b>SuLawko</b>.
 </p>
 
 <p align="center">
-  <a href="https://github.com/sulawko/monster-input-buffer/releases/latest"><b>⬇ Descargar</b></a> ·
-  <a href="https://sulawko.github.io/monster-input-buffer/">Web</a> ·
+  <a href="https://github.com/sulawko/monster-input-buffer/releases/latest"><b>⬇ Download</b></a> ·
+  <a href="https://sulawko.github.io/monster-input-buffer/">Website</a> ·
   <a href="https://discord.gg/dsYchZdGvf">Discord</a>
 </p>
 
 ---
 
-## ¿Qué hace?
+## What does it do?
 
-Simula tu click unos ticks hacia adelante con dos jugadores "fantasma" invisibles. Si clickear ahora te mata, pero un click apenas más tarde sobrevive, tu input se retrasa y se entrega en el tick correcto. Es una ayuda potente pero no exagerada (1 tick = 0.25 frames a 60 fps).
+It simulates your click a few ticks ahead using two invisible "ghost" players. If clicking now would kill you, but a click slightly later survives, your input is held back and delivered at the right tick. It is a strong but not exaggerated help (1 tick = 0.25 frames at 60 fps).
 
-- Cubo, bola, ufo, spider, robot, swing y wave (clicks y soltadas). La nave no se toca.
-- Orbes, pads, portales de gravedad y de velocidad también se simulan.
-- El spam rápido de wave se deja intacto.
+- Cube, ball, ufo, spider, robot, swing and wave (presses and releases). The ship is never touched.
+- Orbs, pads, gravity portals and speed portals are simulated too.
+- Fast wave spam is left alone.
 
-## Instalación
+## Installation
 
-1. Instalá [Geode](https://geode-sdk.org) (versión 5.11.2 o más nueva) en Geometry Dash 2.2081, Windows.
-2. Descargá `sulawko.monster-input-buffer.geode` desde la [última release](https://github.com/sulawko/monster-input-buffer/releases/latest).
-3. Copialo a la carpeta `geode/mods` del juego (o arrastralo sobre el juego) y reiniciá.
+1. Install [Geode](https://geode-sdk.org) (version 5.11.2 or newer) on Geometry Dash 2.2081, Windows.
+2. Download `sulawko.monster-input-buffer.geode` from the [latest release](https://github.com/sulawko/monster-input-buffer/releases/latest).
+3. Copy it into the game's `geode/mods` folder (or drag it onto the game) and restart.
 
-## Uso
+## Usage
 
-| Tecla | Acción |
+| Key | Action |
 | --- | --- |
-| **F6** | Cambia la intensidad: 0.5f → 1f → 2f → 4f → 6f → 8f → custom → apagado |
-| **K** | Muestra / oculta el panel de log en el nivel |
+| **F6** | Cycles the strength: 0.5f → 1f → 2f → 4f → 6f → 8f → custom → off |
+| **K** | Shows / hides the log panel inside a level |
 
-Al abrir el juego también se abre una consola con el mismo log. Cada vez que el mod te salva un click, lo anota (por ejemplo `SAVED press +3t`). Los ajustes (delay custom, tiempo de predicción, etc.) están en la configuración del mod dentro de Geode.
+A console window with the same log also opens when the game starts. Every time the mod saves one of your clicks it logs it (for example `SAVED press +3t`). The settings (custom delay, prediction time, etc.) are in the mod's configuration inside Geode.
 
-## Importante
+## Important
 
-Este mod cambia el timing de tus inputs: las completaciones hechas con él pueden no valer como legítimas en listas o rankings. Usalo bajo tu propia responsabilidad.
+This mod changes the timing of your inputs: completions made with it may not count as legit on lists or leaderboards. Use it at your own risk.
 
-Mod no oficial, no afiliado a RobTop Games ni al equipo de Geode.
+Unofficial mod, not affiliated with RobTop Games or the Geode team.
 
 ---
 
-<sub>Este repositorio contiene la página web del mod y sus descargas (Releases). Para actualizar la descarga, editar el bloque `CONFIG` de `index.html` (`DOWNLOAD_URL`, `SHA256`, `YOUTUBE_ID`).</sub>
+<sub>This repository contains the mod's website and its downloads (Releases). To update the download, edit the `CONFIG` block in `index.html` (`DOWNLOAD_URL`, `SHA256`, `YOUTUBE_ID`).</sub>
