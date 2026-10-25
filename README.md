@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://github.com/sulawko/monster-input-buffer/releases/latest"><b>⬇ Download</b></a> ·
   <a href="https://sulawko.github.io/monster-input-buffer/">Website</a> ·
-  <a href="https://discord.gg/Ya9GCDp7fd">Discord</a>
+  <a href="https://discord.gg/XYz79HdKPS">Discord</a>
 </p>
 
 ---
