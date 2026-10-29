@@ -1,1168 +1,1444 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Monster Input Buffer — Never lose a run to an early click</title>
-  <meta name="description" content="Free Geode mod for Geometry Dash 2.208 that saves your run when you click too early. Predictive input buffer with orb, pad and portal support." />
-  <meta name="theme-color" content="#0a0714" />
-  <meta name="color-scheme" content="dark" />
-  <meta name="robots" content="index, follow" />
-  <meta name="author" content="SuLawko" />
-  <meta name="copyright" content="© 2026 SuLawko" />
-  <link rel="canonical" href="https://sulawko.github.io/monster-input-buffer/" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Monster Input Buffer — Never lose a run to an early click</title>
+<meta name="description" content="Free Geode mod for Geometry Dash 2.208 that saves your run when you click too early. Predictive input buffer with orb, pad and portal support.">
+<meta name="theme-color" content="#050508">
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="index, follow">
+<meta name="author" content="SuLawko">
+<meta name="copyright" content="© 2026 SuLawko">
+<link rel="canonical" href="https://sulawko.github.io/monster-input-buffer/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Monster Input Buffer">
+<meta property="og:title" content="Monster Input Buffer — Never lose a run to an early click">
+<meta property="og:description" content="Free Geode mod for Geometry Dash 2.208 that saves your run when you click too early. Predictive input buffer with orb, pad and portal support.">
+<meta property="og:url" content="https://sulawko.github.io/monster-input-buffer/">
+<meta property="og:image" content="https://sulawko.github.io/monster-input-buffer/og-image.png?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Monster Input Buffer — a free Geode mod for Geometry Dash 2.208">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="es_AR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Monster Input Buffer — Never lose a run to an early click">
+<meta name="twitter:description" content="Free Geode mod for Geometry Dash 2.208 that saves your run when you click too early. Predictive input buffer with orb, pad and portal support.">
+<meta name="twitter:image" content="https://sulawko.github.io/monster-input-buffer/og-image.png?v=2">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Monster Input Buffer",
+  "author": { "@type": "Person", "name": "SuLawko" },
+  "copyrightHolder": { "@type": "Person", "name": "SuLawko" },
+  "applicationCategory": "GameApplication",
+  "operatingSystem": "Windows",
+  "description": "Mod de SuLawko para Geometry Dash 2.208.",
+  "url": "https://sulawko.github.io/monster-input-buffer/",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@300;400;600&family=Chivo+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.css">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrambleTextPlugin.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"></script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"
+} }
+</script>
+<style>
+:root{
+  --negro:#050508; --negro-2:#0c0b14; --silicio:#9b93b4; --hueso:#f5f3ff; --tinta:#0a0714;
+  --tinta-suave:#6d6585; --acento:#a855f7; --cian:#3be8ff; --linea:rgba(245,243,255,.12);
+  --display:"Chivo",system-ui,sans-serif; --mono:"Chivo Mono",ui-monospace,Menlo,monospace;
+  --gutter:clamp(16px,3.2vw,52px); --ease-out:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:auto;-webkit-text-size-adjust:100%}
+html.lenis,html.lenis body{height:auto}
+body{margin:0;background:var(--negro);color:var(--hueso);font:400 16px/1.5 var(--display);overflow-x:hidden;
+  -webkit-font-smoothing:antialiased}
+body.flood-on{--hueso:#0a0714;--linea:rgba(10,7,20,.18);--tinta-suave:#3b1a66}
+a{color:inherit}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--cian);outline-offset:3px}
+#gl{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+main{position:relative;z-index:1}
+.mono{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;line-height:1.5}
+.mono b{font-weight:500;color:var(--hueso)}
 
-  <!-- Open Graph / Twitter (vista previa al compartir el link) -->
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="Monster Input Buffer" />
-  <meta property="og:title" content="Monster Input Buffer — Never lose a run to an early click" />
-  <meta property="og:description" content="Free Geode mod for Geometry Dash 2.208 that saves your run when you click too early. Predictive input buffer with orb, pad and portal support." />
-  <meta property="og:url" content="https://sulawko.github.io/monster-input-buffer/" />
-  <meta property="og:image" content="https://sulawko.github.io/monster-input-buffer/og-image.png?v=2" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Monster Input Buffer — a free Geode mod for Geometry Dash 2.208" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:locale:alternate" content="es_AR" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Monster Input Buffer — Never lose a run to an early click" />
-  <meta name="twitter:description" content="Free Geode mod for Geometry Dash 2.208 that saves your run when you click too early. Predictive input buffer with orb, pad and portal support." />
-  <meta name="twitter:image" content="https://sulawko.github.io/monster-input-buffer/og-image.png?v=2" />
+/* ---------- intro ---------- */
+#intro{position:fixed;inset:0;z-index:60;background:var(--negro);display:grid;place-items:center;overflow:hidden;
+  clip-path:inset(0 0 0 0)}
+#intro .ret{position:absolute;inset:0;background-image:linear-gradient(rgba(168,85,247,.55) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(168,85,247,.55) 1px,transparent 1px);background-size:3.85vw 3.85vw;opacity:0;
+  mask-image:radial-gradient(70% 70% at 50% 50%,#000 30%,transparent 100%)}
+#intro .barra{position:absolute;left:0;right:0;top:-2px;height:2px;background:var(--acento);
+  box-shadow:0 0 24px 4px rgba(168,85,247,.6);transform:translateY(-4px)}
+#intro .marca{font-weight:300;font-size:clamp(40px,7vw,120px);letter-spacing:-.04em;line-height:1;color:var(--acento);
+  display:flex;gap:.02em}
+#intro .marca span{display:inline-block;opacity:0;filter:blur(10px);transform:translateY(.3em)}
+#intro .txt{position:absolute;left:var(--gutter);bottom:calc(var(--gutter) + env(safe-area-inset-bottom));color:var(--acento)}
+#intro .txt2{position:absolute;right:var(--gutter);bottom:calc(var(--gutter) + env(safe-area-inset-bottom));color:var(--acento);text-align:right}
 
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "Monster Input Buffer",
-    "author": { "@type": "Person", "name": "SuLawko" },
-    "copyrightHolder": { "@type": "Person", "name": "SuLawko" },
-    "applicationCategory": "GameApplication",
-    "operatingSystem": "Windows",
-    "description": "Mod de SuLawko para Geometry Dash 2.208.",
-    "url": "https://sulawko.github.io/monster-input-buffer/",
-    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
-  }
-  </script>
+/* ---------- nav ---------- */
+.nav{position:fixed;inset:0 0 auto 0;z-index:40;display:flex;align-items:center;justify-content:space-between;
+  padding:18px var(--gutter);pointer-events:none;transition:color .4s}
+.nav>*{pointer-events:auto}
+.nav::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:0;transition:opacity .4s;
+  background:linear-gradient(180deg,rgba(5,5,8,.78),rgba(5,5,8,0));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  mask-image:linear-gradient(#000 45%,transparent);-webkit-mask-image:linear-gradient(#000 45%,transparent)}
+body.nav-solida .nav::before{opacity:1}
+body.claro-on .nav{color:var(--tinta)}
+body.claro-on .nav::before{background:linear-gradient(180deg,rgba(245,243,255,.86),rgba(245,243,255,0))}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:600;letter-spacing:.02em;font-size:15px}
+.logo svg{width:22px;height:22px}
+.nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0}
+.nav ul a{text-decoration:none;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.8;
+  display:inline-block;min-width:var(--w,auto);transition:opacity .3s}
+.nav ul a:hover{opacity:1}
+.nav .der{display:flex;align-items:center;gap:10px}
+.lang{font:500 11px/1 var(--mono);letter-spacing:.1em;border:1px solid currentColor;border-radius:999px;padding:10px 12px;background:transparent;cursor:pointer;opacity:.8}
+.lang:hover{opacity:1}
+.btn{position:relative;isolation:isolate;overflow:hidden;display:inline-flex;align-items:center;gap:10px;border:1px solid currentColor;border-radius:999px;padding:10px 18px;
+  text-decoration:none;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:transparent;
+  cursor:pointer;transition:color .35s}
+.btn::before{content:"";position:absolute;inset:-1px;z-index:-1;background:var(--hueso);transform:scaleX(0);transform-origin:left;
+  transition:transform .5s var(--ease-out)}
+.btn:hover::before,.btn:focus-visible::before{transform:scaleX(1)}
+.btn:hover,.btn:focus-visible{color:var(--negro)}
+.btn.lleno{background:var(--acento);border-color:var(--acento);color:var(--negro)}
+.btn.lleno::before{background:var(--hueso)}
+body.flood-on .btn:hover,body.flood-on .btn:focus-visible{color:var(--acento)}
+.logo .lg-c{display:none}
+@media (max-width:820px){.nav ul{display:none}}
+@media (max-width:520px){.logo .lg-l{display:none}.logo .lg-c{display:inline}}
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+/* ---------- hero ---------- */
+#hero{position:relative;height:100svh;min-height:600px;overflow:hidden}
+#hero .poster{position:absolute;inset:0;z-index:0;display:none}
+#hero .poster img{width:100%;height:100%;object-fit:cover;opacity:.6}
+body.no-webgl #hero .poster{display:block}
+.hud{position:absolute;z-index:2;pointer-events:none;color:var(--hueso)}
+.hud.tl{left:var(--gutter);top:calc(var(--gutter) + 52px)}
+.hud.tr{right:var(--gutter);top:calc(var(--gutter) + 52px);text-align:right}
+.hud.bl{left:var(--gutter);bottom:var(--gutter)}
+.hud.br{right:var(--gutter);bottom:var(--gutter);text-align:right}
+.hud .mono{opacity:.72}
+.hud .mono b{opacity:1}
+.titular{position:absolute;z-index:2;margin:0;font-weight:300;letter-spacing:-.045em;line-height:.86;
+  font-size:clamp(64px,14vw,240px);pointer-events:none}
+.titular .l{display:inline-block;white-space:pre}
+.titular .l span{display:inline-block;will-change:transform,filter}
+#t1,#t2{font-size:clamp(56px,11.5vw,220px)}
+#t1{left:var(--gutter);top:20vh}
+#t2{right:var(--gutter);bottom:15vh;text-align:right}
+#t2 em{font-style:normal;color:var(--acento)}
+.hero-p{position:absolute;z-index:2;left:var(--gutter);bottom:calc(var(--gutter) + 124px);max-width:36ch;margin:0;
+  font-size:clamp(14px,1.1vw,17px);color:var(--silicio);opacity:0}
+.hero-p b{color:var(--hueso);font-weight:400}
+.hero-cta{position:absolute;z-index:2;left:var(--gutter);bottom:calc(var(--gutter) + 58px);display:flex;flex-wrap:wrap;gap:10px;opacity:0}
+.cursor{position:fixed;z-index:45;left:0;top:0;width:34px;height:34px;border:1px solid var(--cian);border-radius:50%;
+  pointer-events:none;transform:translate(-50%,-50%);opacity:0;transition:opacity .3s,width .3s,height .3s;mix-blend-mode:screen}
+.cursor::after{content:attr(data-t);position:absolute;left:24px;top:-4px;font:500 10px/1 var(--mono);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--cian);white-space:nowrap}
+body.puntero-ok .cursor.visible{opacity:1}
+@media (max-width:820px){
+  #hero{min-height:640px}
+  #t1{top:17vh}#t2{bottom:36vh}
+  .hud.tr,.hud.br{display:none}
+  .hero-p{bottom:calc(var(--gutter) + 104px);max-width:30ch;font-size:13px;line-height:1.45}
+  .hero-cta{bottom:calc(var(--gutter) + 46px)}
+  .hud.bl .mono{font-size:10px}
+}
 
-  <!-- Fuentes -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+/* ---------- zoom ---------- */
+#zoom{position:relative;height:520svh}
+#zoom .fijo{position:sticky;top:0;height:100svh;overflow:hidden}
+.zoom-velo{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(0deg,rgba(5,5,8,.74) 0,rgba(5,5,8,.38) 24%,transparent 48%),linear-gradient(180deg,rgba(5,5,8,.5) 0,transparent 24%)}
+body.flood-on .zoom-velo{background:linear-gradient(0deg,rgba(214,176,255,.82) 0,rgba(214,176,255,.42) 24%,transparent 48%),linear-gradient(180deg,rgba(214,176,255,.6) 0,transparent 24%)}
+.escala-num{position:absolute;left:var(--gutter);bottom:calc(var(--gutter) + 64px);margin:0;font-weight:300;
+  letter-spacing:-.05em;line-height:.9;font-size:clamp(72px,13vw,220px);pointer-events:none;color:var(--hueso)}
+.escala-num small{font-size:.42em;letter-spacing:-.02em;margin-left:.18em}
+.escala-txt{position:absolute;left:var(--gutter);bottom:var(--gutter);margin:0;max-width:46ch;color:var(--hueso);opacity:.92;overflow-wrap:anywhere}
+.zoom-hud{position:absolute;right:var(--gutter);top:calc(var(--gutter) + 52px);text-align:right;color:var(--hueso)}
+.zoom-hud .aum{font-family:var(--mono);font-size:clamp(18px,2.2vw,30px);letter-spacing:0;text-transform:none;margin-top:6px}
+.barra-escala{position:absolute;right:var(--gutter);bottom:var(--gutter);width:22vw;min-width:120px;color:var(--hueso)}
+.barra-escala .l{height:1px;background:currentColor;position:relative;margin-bottom:8px}
+.barra-escala .l::before,.barra-escala .l::after{content:"";position:absolute;top:-5px;width:1px;height:11px;background:currentColor}
+.barra-escala .l::after{right:0}
+.barra-escala .v{font-family:var(--mono);font-size:14px;letter-spacing:.04em;text-transform:none}
+.zoom-etapas{position:absolute;left:var(--gutter);top:calc(var(--gutter) + 52px);display:grid;gap:6px;color:var(--hueso)}
+.zoom-etapas span{opacity:.35;transition:opacity .3s}
+.zoom-etapas span.on{opacity:1}
+.zoom-etapas span::before{content:"";display:inline-block;width:18px;height:1px;background:currentColor;margin-right:10px;vertical-align:middle}
+.estados{display:none;padding:12vh var(--gutter);gap:4vh}
+.estado{display:grid;grid-template-columns:1fr 1fr;gap:4vw;align-items:center;min-height:60svh;border-top:1px solid var(--linea);padding:6vh 0}
+.estado .cuadro{aspect-ratio:16/10;border:1px solid var(--linea)}
+.estado h3{font-weight:300;font-size:clamp(44px,8vw,120px);margin:0 0 12px;letter-spacing:-.04em;line-height:.9}
+body.estatico #zoom{height:auto}
+body.estatico #zoom .fijo{display:none}
+body.estatico .estados{display:grid}
+@media (max-width:820px){
+  .zoom-etapas{display:none}.escala-num{bottom:calc(var(--gutter) + 110px)}.escala-txt{max-width:80vw;font-size:14px}
+  .barra-escala{width:32vw;bottom:calc(var(--gutter) + 70px)}.estado{grid-template-columns:1fr}
+}
 
-  <style>
-    /* ============================================================
-       VARIABLES
-    ============================================================ */
-    :root {
-      --bg: #050508;
-      --bg-2: #0a0a12;
-      --surface: #0e0e18;
-      --surface-2: #14141f;
-      --border: rgba(168, 85, 247, 0.16);
-      --border-strong: rgba(168, 85, 247, 0.42);
-      --purple: #a855f7;
-      --purple-2: #7c3aed;
-      --purple-3: #c084fc;
-      --neon: #b026ff;
-      --text: #f5f3ff;
-      --muted: #9b93b4;
-      --font-display: "Space Grotesk", system-ui, -apple-system, sans-serif;
-      --font-body: "Inter", system-ui, -apple-system, sans-serif;
-      --radius: 18px;
-      --ease: cubic-bezier(0.22, 1, 0.36, 1);
-    }
+/* ---------- demo ---------- */
+#demo{position:relative;min-height:100svh;padding:calc(var(--gutter) + 96px) var(--gutter) 12vh;display:grid;grid-template-columns:1fr 1fr;gap:5vw;align-items:start}
+#demo::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(5,5,8,0) 0,rgba(5,5,8,.3) 30%,rgba(5,5,8,.5) 100%)}
+h2.sec{font-weight:300;font-size:clamp(44px,7vw,120px);letter-spacing:-.045em;line-height:.9;margin:0 0 24px}
+h2.sec em{font-style:normal;color:var(--acento)}
+.lead{color:var(--silicio);max-width:46ch;font-size:clamp(15px,1.2vw,19px);margin:0}
+.consola{border:1px solid var(--linea);background:rgba(5,5,8,.74);backdrop-filter:blur(10px);padding:22px;display:grid;gap:16px}
+.fuerza-fila{display:grid;gap:8px}
+.fuerzas{display:flex;flex-wrap:wrap;gap:6px}
+.fuerzas button{font:500 11px/1 var(--mono);letter-spacing:.06em;padding:8px 11px;border:1px solid var(--linea);border-radius:999px;background:transparent;cursor:pointer;transition:background .25s,border-color .25s,color .25s}
+.fuerzas button:hover{border-color:var(--silicio)}
+.fuerzas button[aria-pressed="true"]{background:var(--acento);border-color:var(--acento);color:var(--negro)}
+.pista{width:100%;height:124px;display:block;border:1px solid var(--linea);background:rgba(5,5,8,.6);cursor:pointer;touch-action:manipulation}
+.pista-fila{display:flex;gap:14px;align-items:center}
+kbd{font:500 10px/1 var(--mono);border:1px solid var(--linea);border-radius:4px;padding:4px 7px;color:var(--hueso)}
+.log{font:400 13px/1.7 var(--mono);min-height:7lh;max-height:7lh;overflow:hidden;color:var(--silicio)}
+.log div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.log .ok{color:var(--cian)} .log .salvado{color:var(--acento)} .log .mal{color:var(--silicio);opacity:.8}
+.tok{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;border-top:1px solid var(--linea);padding-top:14px}
+.tok b{display:block;font:500 clamp(20px,2vw,28px)/1 var(--mono);letter-spacing:0;text-transform:none;color:var(--cian);margin-bottom:4px;font-variant-numeric:tabular-nums}
+.tok .mono{opacity:.7}
+@media (max-width:820px){#demo{grid-template-columns:1fr;gap:8vh}}
 
-    /* ============================================================
-       BASE
-    ============================================================ */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    [hidden] { display: none !important; }
-    html { scroll-behavior: smooth; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-body);
-      line-height: 1.6;
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-    }
-    a { color: inherit; }
-    ::selection { background: rgba(168, 85, 247, 0.4); color: #fff; }
+/* ---------- cifras ---------- */
+#metricas{position:relative;min-height:100svh;padding:calc(var(--gutter) + 96px) var(--gutter) 16vh;overflow:hidden;
+  background:radial-gradient(70% 55% at 78% 22%,rgba(168,85,247,.18),transparent 70%),var(--negro)}
+#metricas::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(90deg,rgba(245,243,255,.05) 0 1px,transparent 1px 24px);
+  mask-image:linear-gradient(180deg,transparent,#000 25%,#000 70%,transparent);-webkit-mask-image:linear-gradient(180deg,transparent,#000 25%,#000 70%,transparent)}
+#metricas>*{position:relative;z-index:1}
+.cifras{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin:10vh 0 12vh;border-top:1px solid var(--linea)}
+.cifra{padding-top:22px;border-right:1px solid var(--linea);padding-right:18px;display:grid;gap:10px;align-content:start}
+.cifra:last-child{border-right:0}
+.cifra b{display:block;font-weight:300;font-size:clamp(44px,5.4vw,96px);letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums;
+  text-shadow:0 2px 30px rgba(0,0,0,.6)}
+.cifra b small{font-size:.38em;letter-spacing:0;color:var(--silicio);margin-left:.15em}
+.cifra .mono{color:var(--silicio)}
+.cifra .mini{width:100%;max-width:150px;height:34px;display:block;overflow:visible}
+.cifra .mini polyline{fill:none;stroke:var(--acento);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round}
+.cifra .mini circle{fill:var(--acento)}
+.cifra .mini line{stroke:var(--linea)}
+.grafico{display:grid;grid-template-columns:1fr 2fr;gap:4vw;align-items:end}
+.grafico svg{width:100%;height:auto;overflow:visible}
+.grafico text{font-family:var(--mono);font-size:11px;letter-spacing:.08em;fill:var(--silicio)}
+.grafico .val{fill:var(--hueso);font-size:14px}
+.rasgos{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:12vh;border-top:1px solid var(--linea);padding-top:22px}
+.rasgos h3{font-weight:300;font-size:clamp(26px,2.4vw,40px);letter-spacing:-.03em;margin:10px 0 10px;line-height:1}
+.rasgos p{margin:0;color:var(--silicio);max-width:36ch}
+.rasgos .mono{color:var(--acento)}
+.modos{margin-top:7vh;display:grid;gap:8px;color:var(--silicio)}
+.modos b{color:var(--acento);font-weight:500}
+@media (max-width:820px){.cifras{grid-template-columns:1fr 1fr}.cifra:nth-child(2){border-right:0}.grafico,.rasgos{grid-template-columns:1fr}}
 
-    /* ============================================================
-       FONDO: partículas + brillo del cursor
-    ============================================================ */
-    #bg {
-      position: fixed; inset: 0; z-index: 0;
-      pointer-events: none; opacity: 0.9;
-    }
-    .cursor-glow {
-      position: fixed; top: 0; left: 0; z-index: 0;
-      width: 560px; height: 560px; pointer-events: none;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(168, 85, 247, 0.10), transparent 62%);
-      will-change: transform;
-    }
-    @media (hover: none) { .cursor-glow { display: none; } }
+/* ---------- instalación ---------- */
+#instalar{position:relative;height:320svh}
+#instalar .fijo{position:sticky;top:0;height:100svh;overflow:hidden}
+#instalar .poster{position:absolute;inset:0;display:none;
+  background:radial-gradient(55% 45% at 40% 58%,rgba(168,85,247,.32),transparent 70%),repeating-linear-gradient(90deg,rgba(245,243,255,.05) 0 1px,transparent 1px 32px),var(--negro)}
+body.no-webgl #instalar .poster{display:block}
+.srv-velo{position:absolute;inset:0;pointer-events:none;background:radial-gradient(85% 75% at 50% 48%,transparent 50%,rgba(5,5,8,.72) 100%)}
+.srv-t1{left:var(--gutter);top:calc(var(--gutter) + 64px);font-size:clamp(48px,8vw,140px);text-shadow:0 2px 24px rgba(0,0,0,.5)}
+.srv-t2{right:var(--gutter);bottom:calc(var(--gutter) + 80px);text-align:right;font-size:clamp(48px,8vw,140px);text-shadow:0 2px 24px rgba(0,0,0,.5)}
+.srv-p{position:absolute;right:var(--gutter);top:calc(var(--gutter) + 72px);max-width:36ch;text-align:right;color:var(--silicio);margin:0;font-size:clamp(14px,1.1vw,17px)}
+.pasos{position:absolute;left:var(--gutter);bottom:var(--gutter);display:grid;grid-template-columns:repeat(3,auto);gap:34px;margin:0;padding:0;list-style:none;
+  color:var(--hueso);text-shadow:0 2px 14px rgba(0,0,0,.7);counter-reset:p}
+.pasos li{counter-increment:p;opacity:.38;transition:opacity .4s}
+.pasos li.on{opacity:1}
+.pasos b{display:block;font:500 clamp(18px,2vw,28px)/1 var(--mono);text-transform:none;letter-spacing:0;margin-bottom:6px}
+.pasos b::before{content:"0" counter(p) " ";color:var(--silicio)}
+.pasos li.on b{color:var(--acento)}
+@media (max-width:820px){.srv-p{display:none}.pasos{grid-template-columns:1fr 1fr;gap:14px}.srv-t2{bottom:calc(var(--gutter) + 130px)}}
 
-    /* ============================================================
-       NAVBAR
-    ============================================================ */
-    .nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 22px clamp(20px, 5vw, 60px);
-      border-bottom: 1px solid transparent;
-      transition: background 0.4s, border-color 0.4s, padding 0.4s, backdrop-filter 0.4s;
-    }
-    .nav.scrolled {
-      background: rgba(5, 5, 8, 0.72);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border-bottom: 1px solid var(--border);
-      padding-top: 14px; padding-bottom: 14px;
-    }
-    .logo {
-      display: flex; align-items: center; gap: 11px;
-      font-family: var(--font-display); font-weight: 700;
-      letter-spacing: 0.06em; font-size: 1.02rem; text-decoration: none;
-    }
-    .logo-mark {
-      width: 30px; height: 30px; display: grid; place-items: center;
-      border-radius: 8px;
-      background: linear-gradient(135deg, var(--purple), var(--purple-2));
-      box-shadow: 0 0 18px rgba(168, 85, 247, 0.55);
-      font-size: 15px; font-weight: 700; color: #fff;
-    }
-    .logo small { color: var(--muted); font-weight: 500; letter-spacing: 0.14em; }
-    .nav-links {
-      display: flex; align-items: center; gap: 34px; list-style: none;
-    }
-    .nav-links a {
-      color: var(--muted); text-decoration: none; font-size: 14px;
-      position: relative; transition: color 0.3s;
-    }
-    .nav-links a::after {
-      content: ""; position: absolute; left: 0; bottom: -6px;
-      width: 0; height: 1px; background: linear-gradient(90deg, var(--purple), var(--purple-3));
-      transition: width 0.3s var(--ease);
-    }
-    .nav-links a:hover { color: var(--text); }
-    .nav-links a:hover::after { width: 100%; }
+/* ---------- faq (sección clara) ---------- */
+#faq{background:var(--hueso);color:var(--tinta);padding:14vh var(--gutter);display:grid;grid-template-columns:1.1fr .9fr;gap:5vw;position:relative;z-index:2}
+#faq h2.sec em{color:#7c3aed}
+#faq .mono{color:#5d5575}
+#faq .btn::before{background:var(--tinta)}
+#faq .btn:hover,#faq .btn:focus-visible{color:var(--hueso)}
+.preguntas{margin:32px 0 0;border-top:1px solid rgba(10,7,20,.18)}
+.preguntas details{border-bottom:1px solid rgba(10,7,20,.18)}
+.preguntas summary{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;padding:16px 0;cursor:pointer;list-style:none;
+  font-size:clamp(17px,1.5vw,22px);transition:padding .3s var(--ease-out)}
+.preguntas summary::-webkit-details-marker{display:none}
+.preguntas summary:hover{padding-left:10px}
+.preguntas .fl{width:26px;height:26px;border:1px solid currentColor;border-radius:50%;display:grid;place-items:center;font:500 14px/1 var(--mono);
+  transition:background .3s,color .3s,transform .4s var(--ease-out)}
+.preguntas summary:hover .fl{background:var(--tinta);color:var(--hueso)}
+.preguntas details[open] .fl{transform:rotate(45deg)}
+.preguntas details p{margin:0 0 20px;color:#4d4566;max-width:62ch;line-height:1.65}
+.preguntas details p a{color:#7c3aed}
+.lado{display:grid;gap:18px;align-content:start}
+.diagrama{border:1px solid rgba(10,7,20,.14);aspect-ratio:4/3;position:relative;overflow:hidden;background:
+  radial-gradient(90% 70% at 30% 80%,#e6def7,transparent 70%),linear-gradient(#faf8ff,#eeeaf7)}
+.diagrama svg{position:absolute;inset:0;width:100%;height:100%}
+.diagrama path,.diagrama line,.diagrama rect{stroke:#0a0714;fill:none;stroke-width:1.3;vector-effect:non-scaling-stroke}
+.diagrama .tenue{stroke:#8f86a8}
+.diagrama .bueno{stroke:#7c3aed;stroke-width:2}
+.diagrama .pta{fill:#a855f7;stroke:none}
+.diagrama text{font-family:var(--mono);font-size:10px;letter-spacing:.1em;fill:#0a0714}
+.nota{border:1px solid rgba(10,7,20,.14);padding:22px;background:rgba(255,255,255,.45)}
+.nota h3{font-weight:400;font-size:clamp(20px,1.8vw,26px);margin:0 0 8px;letter-spacing:-.02em}
+.nota p{margin:0 0 14px;color:#4d4566}
+.nota ul{margin:10px 0 0;padding-left:18px;color:#4d4566}
+.fila-btn{display:flex;flex-wrap:wrap;gap:10px}
+@media (max-width:820px){#faq{grid-template-columns:1fr}}
 
-    .nav-toggle {
-      display: none; width: 44px; height: 44px;
-      background: none; border: none; cursor: pointer;
-      place-items: center; z-index: 101;
-    }
-    .nav-toggle span {
-      display: block; width: 24px; height: 2px; background: var(--text);
-      border-radius: 2px; position: relative; transition: 0.3s;
-    }
-    .nav-toggle span::before, .nav-toggle span::after {
-      content: ""; position: absolute; left: 0; width: 24px; height: 2px;
-      background: var(--text); border-radius: 2px; transition: 0.3s;
-    }
-    .nav-toggle span::before { top: -7px; }
-    .nav-toggle span::after { top: 7px; }
-    .nav-toggle.open span { background: transparent; }
-    .nav-toggle.open span::before { top: 0; transform: rotate(45deg); }
-    .nav-toggle.open span::after { top: 0; transform: rotate(-45deg); }
+/* ---------- descarga + pie ---------- */
+#descarga{position:relative;background:var(--negro);padding:14vh var(--gutter) 12vh;display:grid;grid-template-columns:1fr 1fr;gap:5vw;z-index:2}
+.teclas{margin:30px 0 0;display:grid;gap:10px}
+.teclas div{display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:baseline;border-top:1px solid var(--linea);padding-top:10px}
+.teclas dt{font:500 13px/1 var(--mono);border:1px solid var(--linea);border-radius:4px;padding:6px 0;text-align:center;color:var(--hueso)}
+.teclas dd{margin:0;color:var(--silicio);font-size:14px}
+.panel{display:grid;gap:16px;border:1px solid var(--linea);padding:26px;background:var(--negro-2)}
+.panel .campo{display:grid;gap:4px;border-bottom:1px solid var(--linea);padding-bottom:12px}
+.panel .eti{font:400 11px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--silicio)}
+.panel .val{font-size:16px}
+.panel code{font:500 12px/1.5 var(--mono);word-break:break-all;color:var(--hueso)}
+.calc{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.calc b{display:block;font:500 clamp(18px,1.8vw,26px)/1 var(--mono);color:var(--acento);margin-bottom:4px;font-variant-numeric:tabular-nums}
+.calc .mono{color:var(--silicio)}
+footer{position:relative;height:100svh;min-height:560px;overflow:hidden;color:var(--hueso)}
+footer .poster{position:absolute;inset:0;display:none;background:radial-gradient(60% 50% at 50% 40%,rgba(168,85,247,.28),transparent 70%),var(--negro)}
+body.no-webgl footer .poster{display:block}
+.pie-velo{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(5,5,8,.55),rgba(5,5,8,.2) 35%,rgba(5,5,8,.65) 75%,rgba(5,5,8,.9))}
+.disc{position:absolute;left:var(--gutter);top:calc(var(--gutter) + 84px);max-width:62ch;margin:0;font-size:12px;line-height:1.6;color:var(--silicio)}
+.disc strong{color:var(--hueso);font-weight:400}
+.marquesina{position:absolute;left:0;right:0;bottom:calc(var(--gutter) + 78px);overflow:hidden;white-space:nowrap;pointer-events:none;
+  font-weight:300;font-size:clamp(56px,11.5vw,200px);letter-spacing:-.04em;line-height:.9}
+.marquesina div{display:inline-block;padding-right:.4em;animation:marq 26s linear infinite}
+.marquesina em{font-style:normal;color:var(--acento)}
+@keyframes marq{to{transform:translateX(-50%)}}
+.pie{position:absolute;left:var(--gutter);right:var(--gutter);bottom:var(--gutter);display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;align-items:end}
+.pie ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.pie a{text-decoration:none}
+.pie a:hover{text-decoration:underline;text-underline-offset:4px}
+.pie .mono{opacity:.8}
+@media (max-width:820px){#descarga{grid-template-columns:1fr}.calc{grid-template-columns:1fr 1fr}.pie{grid-template-columns:1fr 1fr}.pie>:last-child{display:none}.disc{font-size:11px}}
 
-    /* ============================================================
-       BOTONES
-    ============================================================ */
-    .btn {
-      position: relative; display: inline-flex; align-items: center; gap: 10px;
-      font-family: var(--font-display); font-weight: 600; letter-spacing: 0.02em;
-      border-radius: 999px; cursor: pointer; text-decoration: none;
-      border: 1px solid transparent; overflow: hidden;
-      transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease),
-                  background 0.35s, border-color 0.35s;
-    }
-    .btn-sm { padding: 10px 20px; font-size: 13px; }
-    .btn-lg { padding: 18px 36px; font-size: 17px; }
-
-    .btn-primary {
-      color: #fff;
-      background: linear-gradient(135deg, var(--purple) 0%, var(--purple-2) 100%);
-      box-shadow: 0 12px 34px -8px rgba(168, 85, 247, 0.6),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.22);
-    }
-    .btn-primary::before {
-      content: ""; position: absolute; top: 0; left: -120%;
-      width: 55%; height: 100%;
-      background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.45), transparent);
-      transform: skewX(-20deg); transition: left 0.65s var(--ease);
-    }
-    .btn-primary:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 18px 44px -8px rgba(168, 85, 247, 0.8),
-                  0 0 0 1px rgba(192, 132, 252, 0.3);
-    }
-    .btn-primary:hover::before { left: 130%; }
-
-    .btn-ghost {
-      color: var(--text); border-color: rgba(168, 85, 247, 0.38);
-      background: rgba(168, 85, 247, 0.06);
-    }
-    .btn-ghost:hover {
-      border-color: var(--purple-3); background: rgba(168, 85, 247, 0.14);
-      transform: translateY(-3px);
-      box-shadow: 0 12px 34px -14px rgba(168, 85, 247, 0.55);
-    }
-
-    /* Halo pulsante del CTA principal */
-    .btn-pulse { animation: btnPulse 2.8s infinite; }
-    @keyframes btnPulse {
-      0%, 100% { box-shadow: 0 12px 40px -6px rgba(168, 85, 247, 0.6), 0 0 0 0 rgba(168, 85, 247, 0.45); }
-      50%      { box-shadow: 0 12px 40px -6px rgba(168, 85, 247, 0.85), 0 0 0 16px rgba(168, 85, 247, 0); }
-    }
-
-    /* ============================================================
-       HERO
-    ============================================================ */
-    .hero {
-      position: relative; z-index: 2; min-height: 100vh;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      text-align: center; padding: 130px 24px 90px; overflow: hidden;
-    }
-    .hero::before {
-      content: ""; position: absolute; inset: 0; z-index: -1;
-      background-image:
-        linear-gradient(rgba(168, 85, 247, 0.06) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(168, 85, 247, 0.06) 1px, transparent 1px);
-      background-size: 56px 56px;
-      -webkit-mask-image: radial-gradient(ellipse 80% 62% at 50% 42%, #000 25%, transparent 74%);
-      mask-image: radial-gradient(ellipse 80% 62% at 50% 42%, #000 25%, transparent 74%);
-    }
-    .orb { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.5; z-index: -1; }
-    .orb-1 { width: 520px; height: 520px; background: rgba(124, 58, 237, 0.32); top: -12%; left: -6%; animation: float1 16s ease-in-out infinite; }
-    .orb-2 { width: 440px; height: 440px; background: rgba(168, 85, 247, 0.28); bottom: -16%; right: -6%; animation: float2 20s ease-in-out infinite; }
-    @keyframes float1 { 50% { transform: translate(44px, 34px) scale(1.12); } }
-    @keyframes float2 { 50% { transform: translate(-34px, -22px) scale(1.08); } }
-
-    .badge {
-      display: inline-flex; align-items: center; gap: 9px;
-      padding: 8px 16px; border-radius: 999px;
-      border: 1px solid var(--border); background: rgba(168, 85, 247, 0.08);
-      color: var(--purple-3); font-size: 13px; letter-spacing: 0.02em; margin-bottom: 30px;
-    }
-    .badge .dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: var(--neon); box-shadow: 0 0 12px var(--neon); animation: pulse 2s infinite;
-    }
-    @keyframes pulse { 50% { opacity: 0.35; } }
-
-    .hero-title {
-      font-family: var(--font-display); font-weight: 700;
-      font-size: clamp(2.7rem, 9.5vw, 7.8rem);
-      line-height: 0.94; letter-spacing: -0.02em; text-transform: uppercase;
-    }
-    .hero-title .line { display: block; }
-    .hero-title .line-1 {
-      background: linear-gradient(180deg, #ffffff 0%, #e9d5ff 60%, #c084fc 100%);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-      filter: drop-shadow(0 0 34px rgba(168, 85, 247, 0.35));
-    }
-    .hero-title .line-2 {
-      background: linear-gradient(100deg, #c084fc 0%, #a855f7 45%, #7c3aed 100%);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-      filter: drop-shadow(0 0 40px rgba(168, 85, 247, 0.55));
-    }
-
-    .hero-sub {
-      font-size: clamp(1.12rem, 2.4vw, 1.5rem); font-weight: 500;
-      max-width: 720px; margin: 28px auto 0; color: var(--text);
-    }
-    .hero-copy {
-      color: var(--muted); max-width: 620px; margin: 18px auto 0;
-      font-size: clamp(0.95rem, 1.5vw, 1.06rem); line-height: 1.75;
-    }
-    .hero-actions {
-      display: flex; gap: 16px; margin-top: 42px; flex-wrap: wrap; justify-content: center;
-    }
-    .hero-note { margin-top: 24px; font-size: 13px; color: var(--muted); letter-spacing: 0.02em; }
-
-    .scroll-hint {
-      position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%);
-      display: flex; flex-direction: column; align-items: center; gap: 8px;
-      color: var(--muted); font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
-    }
-    .scroll-hint .chev { width: 20px; height: 20px; border-right: 2px solid var(--purple); border-bottom: 2px solid var(--purple); transform: rotate(45deg); animation: chev 1.8s infinite; }
-    @keyframes chev { 0%,100% { transform: rotate(45deg) translate(0,0); opacity: .4; } 50% { transform: rotate(45deg) translate(6px,6px); opacity: 1; } }
-
-    /* ============================================================
-       STATS
-    ============================================================ */
-    .stats {
-      position: relative; z-index: 2;
-      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
-      background: rgba(10, 10, 18, 0.5);
-    }
-    .stats-inner {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 24px;
-      max-width: 1100px; margin: 0 auto; padding: 44px 24px;
-    }
-    .stat { text-align: center; }
-    .stat-value {
-      font-family: var(--font-display); font-weight: 700;
-      font-size: clamp(1.8rem, 4vw, 2.7rem); line-height: 1;
-      background: linear-gradient(180deg, #fff, #c084fc);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
-    .stat-label { color: var(--muted); font-size: 12px; margin-top: 8px; letter-spacing: 0.12em; text-transform: uppercase; }
-
-    /* ============================================================
-       SECCIONES GENÉRICAS
-    ============================================================ */
-    .section { position: relative; z-index: 2; padding: 120px 24px; max-width: 1200px; margin: 0 auto; }
-    .section-head { text-align: center; max-width: 660px; margin: 0 auto 64px; }
-    .eyebrow {
-      color: var(--purple-3); font-size: 12px; letter-spacing: 0.2em;
-      text-transform: uppercase; font-weight: 600; margin-bottom: 16px;
-    }
-    .section-title {
-      font-family: var(--font-display); font-weight: 700;
-      font-size: clamp(2rem, 5vw, 3.1rem); line-height: 1.05; letter-spacing: -0.02em;
-    }
-    .section-sub { color: var(--muted); margin-top: 18px; line-height: 1.7; font-size: 1.02rem; }
-
-    /* ============================================================
-       FEATURES
-    ============================================================ */
-    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; perspective: 1100px; }
-    .card {
-      position: relative; padding: 36px 30px; overflow: hidden;
-      background: linear-gradient(180deg, rgba(22, 22, 34, 0.55), rgba(10, 10, 18, 0.55));
-      border: 1px solid var(--border); border-radius: var(--radius);
-      transition: border-color 0.4s, box-shadow 0.4s;
-      will-change: transform;
-    }
-    .card::before {
-      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, var(--purple), transparent);
-      opacity: 0; transition: opacity 0.4s;
-    }
-    .card:hover { border-color: var(--border-strong); box-shadow: 0 26px 54px -22px rgba(168, 85, 247, 0.4); }
-    .card:hover::before { opacity: 1; }
-    .card-icon {
-      width: 56px; height: 56px; display: grid; place-items: center; margin-bottom: 24px;
-      border-radius: 14px; border: 1px solid var(--border); color: var(--purple-3);
-      background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(124, 58, 237, 0.1));
-      transition: transform 0.4s var(--ease), box-shadow 0.4s;
-    }
-    .card:hover .card-icon { transform: translateY(-4px); box-shadow: 0 14px 32px -10px rgba(168, 85, 247, 0.6); }
-    .card h3 { font-family: var(--font-display); font-size: 1.32rem; margin-bottom: 10px; letter-spacing: -0.01em; }
-    .card p { color: var(--muted); line-height: 1.7; font-size: 0.96rem; }
-
-    /* ============================================================
-       SHOWCASE
-    ============================================================ */
-    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
-    .split-copy p { color: var(--muted); margin-top: 20px; line-height: 1.75; }
-    .feature-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
-    .chip {
-      padding: 9px 16px; border-radius: 999px; border: 1px solid var(--border);
-      background: rgba(168, 85, 247, 0.06); color: var(--purple-3); font-size: 13px;
-      transition: border-color 0.3s, background 0.3s, transform 0.3s var(--ease);
-    }
-    .chip:hover { border-color: var(--border-strong); background: rgba(168, 85, 247, 0.14); transform: translateY(-2px); }
-
-    .visual {
-      position: relative; height: 320px; display: flex; align-items: center; justify-content: center;
-      border: 1px solid var(--border); border-radius: 26px; overflow: hidden;
-      background: radial-gradient(120% 120% at 50% 0%, rgba(124, 58, 237, 0.18), rgba(10, 10, 18, 0.5) 60%);
-    }
-    .visual::before {
-      content: ""; position: absolute; width: 280px; height: 280px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(168, 85, 247, 0.5), transparent 70%);
-      filter: blur(30px); animation: pulse 4s ease-in-out infinite;
-    }
-    .bars { position: relative; display: flex; gap: 6px; align-items: flex-end; height: 150px; z-index: 1; }
-    .bar {
-      width: 5px; height: 40%; border-radius: 4px;
-      background: linear-gradient(180deg, var(--purple-3), var(--purple-2));
-      box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
-      transform-origin: bottom; animation: eq 1.5s ease-in-out infinite;
-    }
-    @keyframes eq { 0%, 100% { transform: scaleY(0.35); } 50% { transform: scaleY(1); } }
-
-    /* ============================================================
-       TESTIMONIOS
-    ============================================================ */
-    .quote { color: var(--muted); line-height: 1.75; font-size: 0.98rem; }
-    .person { display: flex; align-items: center; gap: 14px; margin-top: 26px; }
-    .avatar {
-      width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
-      font-family: var(--font-display); font-weight: 700; font-size: 15px; color: #fff;
-      background: linear-gradient(135deg, var(--purple), var(--purple-2));
-      box-shadow: 0 0 18px rgba(168, 85, 247, 0.4); flex-shrink: 0;
-    }
-    .person .name { font-weight: 600; font-size: 0.95rem; }
-    .person .role { color: var(--muted); font-size: 12px; letter-spacing: 0.04em; }
-
-    /* ============================================================
-       CTA FINAL
-    ============================================================ */
-    .cta-card {
-      position: relative; text-align: center; padding: 76px 40px; overflow: hidden;
-      border-radius: 30px; border: 1px solid rgba(168, 85, 247, 0.35);
-      background: radial-gradient(120% 130% at 50% 0%, rgba(124, 58, 237, 0.26), rgba(10, 10, 18, 0.6) 60%);
-      box-shadow: 0 34px 90px -34px rgba(168, 85, 247, 0.5);
-    }
-    .cta-card h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(2rem, 5vw, 3.4rem); letter-spacing: -0.02em; line-height: 1.05; }
-    .cta-card p { color: var(--muted); max-width: 520px; margin: 20px auto 0; line-height: 1.7; }
-    .cta-actions { display: flex; gap: 16px; margin-top: 40px; flex-wrap: wrap; justify-content: center; }
-    .cta-meta { margin-top: 26px; font-size: 13px; color: var(--muted); }
-
-    /* ============================================================
-       FOOTER
-    ============================================================ */
-    footer {
-      position: relative; z-index: 2; border-top: 1px solid var(--border);
-      padding: 54px 24px; text-align: center;
-    }
-    footer .logo { justify-content: center; margin-bottom: 16px; }
-    footer .tagline { color: var(--muted); font-size: 14px; max-width: 420px; margin: 0 auto 26px; }
-    .foot-links { display: flex; gap: 26px; justify-content: center; flex-wrap: wrap; }
-    .foot-links a { color: var(--muted); font-size: 13px; text-decoration: none; transition: color 0.3s; }
-    .foot-links a:hover { color: var(--purple-3); }
-    .disclaimer strong { color: var(--purple-3); }
-    .disclaimer { margin-top: 30px; color: #55506a; font-size: 12px; line-height: 1.7; }
-
-    /* ============================================================
-       ANIMACIONES DE ENTRADA
-    ============================================================ */
-    .rise { opacity: 0; transform: translateY(26px); filter: blur(8px); animation: rise 0.9s var(--ease) forwards; }
-    @keyframes rise { to { opacity: 1; transform: none; filter: none; } }
-    .d1 { animation-delay: 0.05s; } .d2 { animation-delay: 0.15s; } .d3 { animation-delay: 0.28s; }
-    .d4 { animation-delay: 0.42s; } .d5 { animation-delay: 0.56s; } .d6 { animation-delay: 0.72s; }
-
-    /* Reveal al hacer scroll */
-    .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); transition-delay: var(--d, 0s); }
-    .reveal.visible { opacity: 1; transform: none; }
-
-    /* ============================================================
-       NAV: grupo izquierdo + iconos chicos (GitHub / Discord) + idioma
-    ============================================================ */
-    .nav-left { display: flex; align-items: center; gap: 14px; }
-    .nav-social { display: flex; align-items: center; gap: 8px; }
-    .icon-btn {
-      width: 34px; height: 34px; display: grid; place-items: center;
-      border-radius: 10px; color: var(--muted); text-decoration: none;
-      border: 1px solid var(--border); background: rgba(168, 85, 247, 0.06);
-      transition: color 0.3s, border-color 0.3s, background 0.3s, transform 0.3s var(--ease), box-shadow 0.3s;
-    }
-    .icon-btn:hover, .icon-btn:focus-visible {
-      color: #fff; border-color: var(--purple-3); background: rgba(168, 85, 247, 0.18);
-      transform: translateY(-2px); box-shadow: 0 10px 24px -10px rgba(168, 85, 247, 0.7);
-    }
-    .lang-btn {
-      font-family: var(--font-display); font-weight: 600; font-size: 12px; letter-spacing: 0.08em;
-      color: var(--muted); background: rgba(168, 85, 247, 0.06); cursor: pointer;
-      border: 1px solid var(--border); border-radius: 999px; padding: 7px 13px;
-      transition: color 0.3s, border-color 0.3s, background 0.3s;
-    }
-    .lang-btn:hover { color: #fff; border-color: var(--purple-3); background: rgba(168, 85, 247, 0.18); }
-    .nav-links .lang-item { display: flex; }
-
-    :focus-visible { outline: 2px solid var(--purple-3); outline-offset: 3px; border-radius: 6px; }
-    .skip-link {
-      position: fixed; left: 12px; top: -60px; z-index: 200; padding: 10px 16px; border-radius: 10px;
-      background: var(--purple-2); color: #fff; text-decoration: none; font-size: 14px; transition: top 0.2s;
-    }
-    .skip-link:focus { top: 12px; }
-
-    /* Estado "descarga próximamente" */
-    .btn[aria-disabled="true"] { cursor: default; }
-    .btn.is-soon { animation: none; }
-    .btn.is-soon:hover { transform: none; }
-
-    /* ============================================================
-       INSTALACIÓN (pasos)
-    ============================================================ */
-    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; counter-reset: step; }
-    .step { position: relative; padding: 34px 28px 30px; }
-    .step-num {
-      font-family: var(--font-display); font-weight: 700; font-size: 2.6rem; line-height: 1;
-      background: linear-gradient(180deg, #fff, var(--purple)); -webkit-background-clip: text;
-      background-clip: text; color: transparent; margin-bottom: 14px;
-    }
-    .step h3 { font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 8px; }
-    .step p { color: var(--muted); font-size: 0.95rem; line-height: 1.7; }
-    .req { margin-top: 28px; text-align: center; color: var(--muted); font-size: 14px; }
-    .req strong { color: var(--purple-3); font-weight: 600; }
-
-    /* ============================================================
-       VIDEO (se muestra solo si se configura un ID de YouTube)
-    ============================================================ */
-    .video-wrap {
-      position: relative; aspect-ratio: 16 / 9; max-width: 900px; margin: 0 auto;
-      border-radius: 22px; overflow: hidden; border: 1px solid var(--border-strong);
-      box-shadow: 0 34px 90px -34px rgba(168, 85, 247, 0.5); background: var(--surface);
-    }
-    .video-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-
-    /* ============================================================
-       FAQ
-    ============================================================ */
-    .faq { max-width: 820px; margin: 0 auto; display: grid; gap: 12px; }
-    .faq details {
-      border: 1px solid var(--border); border-radius: 16px; padding: 0 24px;
-      background: linear-gradient(180deg, rgba(22, 22, 34, 0.5), rgba(10, 10, 18, 0.5));
-      transition: border-color 0.3s, background 0.3s;
-    }
-    .faq details[open] { border-color: var(--border-strong); }
-    .faq summary {
-      list-style: none; cursor: pointer; padding: 20px 0; display: flex; justify-content: space-between;
-      align-items: center; gap: 16px; font-family: var(--font-display); font-weight: 600; font-size: 1.04rem;
-    }
-    .faq summary::-webkit-details-marker { display: none; }
-    .faq summary::after {
-      content: "+"; font-size: 1.5rem; line-height: 1; color: var(--purple-3);
-      transition: transform 0.3s var(--ease); flex-shrink: 0;
-    }
-    .faq details[open] summary::after { transform: rotate(45deg); }
-    .faq details p { color: var(--muted); padding: 0 0 22px; line-height: 1.75; font-size: 0.96rem; }
-    .faq details p a { color: var(--purple-3); }
-
-    /* ============================================================
-       CHANGELOG
-    ============================================================ */
-    .changelog { max-width: 820px; margin: 0 auto; border-left: 1px solid var(--border-strong); padding-left: 28px; display: grid; gap: 30px; }
-    .rel { position: relative; }
-    .rel::before {
-      content: ""; position: absolute; left: -35px; top: 8px; width: 13px; height: 13px; border-radius: 50%;
-      background: var(--neon); box-shadow: 0 0 14px var(--neon);
-    }
-    .rel h3 { font-family: var(--font-display); font-size: 1.15rem; }
-    .rel h3 small { color: var(--muted); font-weight: 500; font-size: 0.82rem; margin-left: 8px; letter-spacing: 0.04em; }
-    .rel ul { margin-top: 10px; padding-left: 18px; color: var(--muted); line-height: 1.8; font-size: 0.96rem; }
-
-    /* ============================================================
-       SEGURIDAD / HASH
-    ============================================================ */
-    .trust { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-    .hash-box {
-      margin-top: 28px; padding: 18px 22px; border-radius: 16px; border: 1px solid var(--border);
-      background: rgba(10, 10, 18, 0.6); display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
-    }
-    .hash-box code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 12.5px; color: var(--purple-3); word-break: break-all; flex: 1 1 280px; }
-    .hash-box .lbl { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
-    .copy-btn {
-      font-family: var(--font-display); font-weight: 600; font-size: 12px; cursor: pointer; color: var(--text);
-      border: 1px solid var(--border-strong); background: rgba(168, 85, 247, 0.1); border-radius: 999px; padding: 7px 14px;
-    }
-    .copy-btn:hover { background: rgba(168, 85, 247, 0.22); }
-
-    /* Comunidad (Discord) */
-    .community-card { text-align: center; padding: 56px 32px; max-width: 820px; margin: 0 auto; }
-    .community-card p { color: var(--muted); max-width: 520px; margin: 16px auto 0; line-height: 1.75; }
-    .community-card .row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
-
-    /* ============================================================
-       RESPONSIVE
-    ============================================================ */
-    @media (max-width: 900px) {
-      .grid-3, .steps, .trust { grid-template-columns: 1fr; }
-      .split { grid-template-columns: 1fr; gap: 40px; }
-      .stats-inner { gap: 36px 16px; }
-      .visual { height: 240px; }
-    }
-    @media (max-width: 820px) {
-      .nav-toggle { display: grid; }
-      .nav-links {
-        position: fixed; top: 0; right: 0; z-index: 99;
-        height: 100vh; width: min(320px, 82vw);
-        flex-direction: column; justify-content: center; gap: 30px;
-        padding: 40px; background: rgba(8, 8, 14, 0.94);
-        backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
-        border-left: 1px solid var(--border);
-        transform: translateX(100%); transition: transform 0.45s var(--ease);
-      }
-      .nav-links.open { transform: translateX(0); }
-      .nav-links a { font-size: 22px; }
-    }
-    @media (max-width: 480px) {
-      .logo small { display: none; }
-      .nav-left { gap: 10px; }
-      .icon-btn { width: 32px; height: 32px; }
-      .cta-card { padding: 56px 22px; }
-      .btn-lg { padding: 16px 26px; font-size: 15px; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; transition-duration: 0.001s !important; }
-      html { scroll-behavior: auto; }
-      .reveal, .rise { opacity: 1; transform: none; filter: none; }
-    }
-  </style>
+@media (prefers-reduced-motion:reduce){
+  .marquesina div{animation:none}
+  #intro{display:none}
+  .btn::before,.preguntas .fl,.nav ul a{transition:none}
+}
+</style>
 </head>
 <body>
-  <a href="#main" class="skip-link" data-i18n="skip">Saltar al contenido</a>
-  <canvas id="bg" aria-hidden="true"></canvas>
-  <div class="cursor-glow" aria-hidden="true"></div>
+<canvas id="gl" aria-hidden="true"></canvas>
+<div class="cursor" aria-hidden="true" data-t="tilt"></div>
 
-  <!-- ============ NAVBAR ============ -->
-  <header class="nav">
-    <div class="nav-left">
-      <a href="#" class="logo" aria-label="Monster Input Buffer">
-        <span class="logo-mark">M</span>
-        <span>MONSTER <small>INPUT BUFFER</small></span>
-      </a>
-      <!-- Botones chicos: GitHub y Discord -->
-      <div class="nav-social">
-        <a class="icon-btn" href="https://github.com/sulawko/monster-input-buffer" target="_blank" rel="noopener" aria-label="GitHub" data-i18n-attr="aria-label:gh_label" title="GitHub">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12.25c0 5.2 3.35 9.6 8.02 11.15.59.11.8-.26.8-.57v-2.1c-3.26.72-3.95-1.4-3.95-1.4-.53-1.38-1.3-1.75-1.3-1.75-1.06-.74.08-.72.08-.72 1.18.08 1.8 1.23 1.8 1.23 1.04 1.82 2.73 1.3 3.4.99.1-.77.41-1.3.74-1.6-2.6-.3-5.34-1.32-5.34-5.9 0-1.3.46-2.37 1.2-3.2-.12-.3-.52-1.52.12-3.17 0 0 .98-.32 3.2 1.22a11 11 0 0 1 5.82 0c2.22-1.54 3.2-1.22 3.2-1.22.64 1.65.24 2.87.12 3.17.75.83 1.2 1.9 1.2 3.2 0 4.59-2.74 5.6-5.35 5.89.42.37.8 1.1.8 2.22v3.29c0 .32.21.7.81.57A11.76 11.76 0 0 0 23.5 12.25 11.5 11.5 0 0 0 12 .5Z"/></svg>
-        </a>
-        <a class="icon-btn" href="https://discord.gg/XYz79HdKPS" target="_blank" rel="noopener" aria-label="Discord" title="Discord">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.32 4.37A19.8 19.8 0 0 0 15.43 2.9a.07.07 0 0 0-.08.04c-.21.38-.45.87-.61 1.26a18.3 18.3 0 0 0-5.49 0c-.17-.4-.4-.88-.62-1.26a.08.08 0 0 0-.08-.04 19.7 19.7 0 0 0-4.89 1.47.07.07 0 0 0-.03.03C.5 9.05-.32 13.6.1 18.09a.08.08 0 0 0 .03.05 19.9 19.9 0 0 0 5.99 3.03.08.08 0 0 0 .08-.03c.46-.63.87-1.3 1.22-2a.08.08 0 0 0-.04-.1 13 13 0 0 1-1.87-.9.08.08 0 0 1-.01-.13l.37-.29a.07.07 0 0 1 .08-.01c3.93 1.8 8.18 1.8 12.07 0a.07.07 0 0 1 .08.01l.37.29a.08.08 0 0 1-.01.13c-.6.35-1.22.65-1.87.9a.08.08 0 0 0-.04.1c.36.7.77 1.37 1.22 2a.08.08 0 0 0 .08.03 19.8 19.8 0 0 0 6-3.03.08.08 0 0 0 .03-.05c.5-5.18-.84-9.68-3.55-13.67a.06.06 0 0 0-.03-.03ZM8.02 15.33c-1.18 0-2.16-1.08-2.16-2.42s.96-2.42 2.16-2.42c1.21 0 2.18 1.09 2.16 2.42 0 1.34-.96 2.42-2.16 2.42Zm7.97 0c-1.18 0-2.16-1.08-2.16-2.42s.95-2.42 2.16-2.42c1.2 0 2.17 1.09 2.16 2.42 0 1.34-.95 2.42-2.16 2.42Z"/></svg>
-        </a>
-      </div>
+<div id="intro" aria-hidden="true">
+  <div class="ret"></div>
+  <div class="barra"></div>
+  <div class="marca"><span>M</span><span>O</span><span>N</span><span>S</span><span>T</span><span>E</span><span>R</span></div>
+  <div class="txt mono"><span data-i18n="in_1">Calibrating input · 240 ticks/s</span><br><b id="intro-pct">0 %</b> · v4.0.4</div>
+  <div class="txt2 mono" data-i18n-html="in_2">Press any key<br>to skip</div>
+</div>
+
+<header class="nav">
+  <a class="logo" href="#hero" aria-label="Monster Input Buffer">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="8" y="8" width="8" height="8" rx="1" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M6 .8v1.6M9.5 .8v1.6M13 .8v1.6M16.5 .8v1.6" stroke="currentColor" stroke-width=".9" opacity=".7"/></svg>
+    <span class="lg-l">Monster Input Buffer</span><span class="lg-c">MIB</span>
+  </a>
+  <nav aria-label="Sections"><ul>
+    <li><a href="#zoom" data-i18n="n_zoom">Zoom</a></li><li><a href="#demo" data-i18n="n_demo">Demo</a></li><li><a href="#metricas" data-i18n="n_cifras">Numbers</a></li>
+    <li><a href="#instalar" data-i18n="n_instalar">Install</a></li><li><a href="#faq">FAQ</a></li>
+  </ul></nav>
+  <div class="der">
+    <button class="lang" id="lang" type="button" aria-label="Cambiar a español">ES</button>
+    <a class="btn" href="#descarga" data-i18n="n_descargar">Download</a>
+  </div>
+</header>
+
+<main>
+<!-- 1 · HERO -->
+<section id="hero" aria-label="Monster Input Buffer">
+  <div class="poster" aria-hidden="true"><img alt="" decoding="async"></div>
+  <div class="hud tl"><div class="mono" data-i18n-html="h_tl">Geometry Dash 2.208 · Geode<br><b>Free, always</b></div></div>
+  <div class="hud tr"><div class="mono" data-i18n-html="h_tr">1 tick = 0.25 frames · <b>240 Hz</b><br>Made by SuLawko</div></div>
+  <h1 class="titular" id="t1" aria-label="Monster Input Buffer"><span class="l">Monster</span></h1>
+  <p class="titular" id="t2" aria-hidden="true"><span class="l">Input<br><em>Buffer.</em></span></p>
+  <p class="hero-p" data-i18n-html="h_p"><b>A SuLawko mod</b> that makes playing feel a lot easier. Forget frustrating timing: Monster Input Buffer shortens the gap between your hand and the game so every jump lands when you meant it to.</p>
+  <div class="hero-cta"><a class="btn lleno" href="#descarga" data-i18n="h_dl">Download now</a><a class="btn" href="#demo" data-i18n="h_ver">See how it feels</a></div>
+  <div class="hud bl"><div class="mono"><span data-i18n="h_hora">UTC time</span> <b id="hud-hora">--:--:--</b><br>v4.0.4 · Windows · Geode ≥ 5.11.2</div></div>
+  <div class="hud br"><div class="mono"><span data-i18n="h_incl">Tilt</span> <b id="hud-tilt">+0.0° / +0.0°</b><br><span data-i18n="h_hint">Move the cursor · scroll to zoom into one click ↓</span></div></div>
+</section>
+
+<!-- 2 · ZOOM EN EL TIEMPO -->
+<section id="zoom" aria-label="Zoom into one click">
+  <div class="fijo">
+    <div class="zoom-velo" aria-hidden="true"></div>
+    <div class="zoom-etapas mono" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="zoom-hud mono"><span data-i18n="z_aum">Zoom</span><div class="aum" id="zoom-aum">×1</div></div>
+    <p class="escala-num"><span id="zoom-num">60</span><small id="zoom-uni">s</small></p>
+    <p class="escala-txt" id="zoom-txt"></p>
+    <div class="barra-escala"><div class="l"></div><div class="v" id="barra-v">13 s</div></div>
+  </div>
+  <div class="estados" id="estados"></div>
+</section>
+
+<!-- 3 · DEMO -->
+<section id="demo" aria-labelledby="demo-h">
+  <div>
+    <h2 class="sec" id="demo-h" data-i18n-html="d_h">Try it<br><em>live.</em></h2>
+    <p class="lead" data-i18n="d_lead">Press Jump (or the space bar) when the spike reaches the line, then try clicking a little early. With the buffer on, early clicks get saved. It's a simulation in your browser with the mod's real tick rate (240 per second); the real window depends on the level and the game mode.</p>
+  </div>
+  <div class="consola">
+    <div class="fuerza-fila"><span class="mono" data-i18n="d_fuerza">Strength · F6</span><div class="fuerzas" id="fuerzas" role="group" aria-label="F6"></div></div>
+    <canvas class="pista" id="pista" aria-hidden="true"></canvas>
+    <div class="pista-fila"><button class="btn lleno" type="button" id="saltar" data-i18n="d_saltar">Jump</button><kbd data-i18n="d_espacio">Space</kbd></div>
+    <div class="log" id="log" aria-live="polite"></div>
+    <div class="tok">
+      <div><b id="d-salv">0</b><span class="mono" data-i18n="d_s1">clicks saved</span></div>
+      <div><b id="d-off">— ms</b><span class="mono" data-i18n="d_s2">last offset</span></div>
+      <div><b id="d-ven">33.3 ms</b><span class="mono" data-i18n="d_s3">buffer window</span></div>
     </div>
-    <ul class="nav-links" id="nav-links">
-      <li><a href="#features" data-i18n="nav_features">Características</a></li>
-      <li><a href="#install" data-i18n="nav_install">Instalación</a></li>
-      <li><a href="#faq" data-i18n="nav_faq">FAQ</a></li>
-      <li><a href="#community" data-i18n="nav_community">Comunidad</a></li>
-      <li class="lang-item"><button type="button" class="lang-btn" id="lang-toggle" aria-label="Cambiar idioma / Change language">EN</button></li>
-      <li><a href="#download" class="btn btn-primary btn-sm" data-i18n="nav_download">Descargar</a></li>
-    </ul>
-    <button class="nav-toggle" aria-label="Abrir menú" aria-controls="nav-links" aria-expanded="false" data-i18n-attr="aria-label:menu_label"><span></span></button>
-  </header>
+  </div>
+</section>
 
-  <main id="main">
-    <!-- ============ HERO ============ -->
-    <section class="hero">
-      <div class="orb orb-1"></div>
-      <div class="orb orb-2"></div>
+<!-- 4 · CIFRAS -->
+<section id="metricas" aria-labelledby="met-h">
+  <h2 class="sec" id="met-h" data-i18n-html="m_h">Real<br><em>numbers.</em></h2>
+  <div class="cifras">
+    <div class="cifra"><b><span data-n="2.208" data-f="ver">0</span></b><svg class="mini" viewBox="0 0 150 34" aria-hidden="true"></svg><span class="mono" data-i18n="m_1">Geometry Dash version</span></div>
+    <div class="cifra"><b><span data-n="0" data-f="int">0</span><small>$</small></b><svg class="mini" viewBox="0 0 150 34" aria-hidden="true"></svg><span class="mono" data-i18n="m_2">Cost, always free</span></div>
+    <div class="cifra"><b><span id="dl-n">—</span></b><svg class="mini" viewBox="0 0 150 34" aria-hidden="true"></svg><span class="mono" id="dl-lbl">Downloads</span></div>
+    <div class="cifra"><b><span data-n="240" data-f="int">0</span><small>Hz</small></b><svg class="mini" viewBox="0 0 150 34" aria-hidden="true"></svg><span class="mono" data-i18n="m_4">Ticks per second · 1 tick = 0.25 frames</span></div>
+  </div>
+  <div class="grafico">
+    <p class="lead" data-i18n="m_lead">Strength is changed with F6 inside the game: 0.5f → 1f → 2f → 4f → 6f → 8f → custom → off. It's the most the mod can hold back an early click. The ship is never touched and fast wave spam is left alone.</p>
+    <svg id="fuerzas-svg" viewBox="0 0 640 262" role="img"></svg>
+  </div>
+  <div class="rasgos">
+    <div><span class="mono">01</span><h3 data-i18n="r1_t">Precision</h3><p data-i18n="r1_p">Your clicks register when you mean them to. Fewer jumps lost by a few milliseconds.</p></div>
+    <div><span class="mono">02</span><h3 data-i18n="r2_t">Snappy response</h3><p data-i18n="r2_p">Your input is translated quickly, without that feeling of fighting the game.</p></div>
+    <div><span class="mono">03</span><h3 data-i18n="r3_t">More flow</h3><p data-i18n="r3_p">Play more relaxed. The level's rhythm leads, not the anxiety about timing.</p></div>
+  </div>
+  <div class="modos mono">
+    <span data-i18n-html="mo_1"><b>Simulates</b> · Cube · Ball · UFO · Spider · Robot · Swing · Wave</span>
+    <span data-i18n-html="mo_2"><b>Also</b> · Orbs · Pads · Gravity portals · Speed portals</span>
+  </div>
+</section>
 
-      <span class="badge rise d1"><span class="dot"></span> <span data-i18n="badge">Disponible para Geometry Dash 2.208</span></span>
-      <h1 class="hero-title rise d2">
-        <span class="line line-1">Monster</span>
-        <span class="line line-2">Input Buffer</span>
-      </h1>
-      <p class="hero-sub rise d3" data-i18n="hero_sub">Un mod de SuLawko para que jugar se sienta mucho más fácil.</p>
-      <p class="hero-copy rise d4" data-i18n="hero_copy">
-        Olvidate del timing frustrante. Monster Input Buffer acorta la distancia entre tu mano y el juego
-        para que cada salto caiga cuando lo pensaste. Vos concentrate en la música… y en ganar.
-      </p>
-      <div class="hero-actions rise d5">
-        <a href="#download" class="btn btn-primary btn-lg btn-pulse">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
-          <span data-i18n="cta_hero">Descargar ahora</span>
-        </a>
-        <a href="#showcase" class="btn btn-ghost btn-lg" data-i18n="cta_feel">Ver cómo se siente</a>
-      </div>
-      <p class="hero-note rise d6" data-i18n="hero_note">Gratis · Para Geometry Dash 2.208 · Hecho por SuLawko</p>
+<!-- 5 · INSTALACIÓN -->
+<section id="instalar" aria-label="Installation">
+  <div class="fijo">
+    <div class="poster" aria-hidden="true"></div>
+    <div class="srv-velo" aria-hidden="true"></div>
+    <h2 class="titular srv-t1"><span class="l">Ready in</span></h2>
+    <p class="titular srv-t2" aria-hidden="true"><span class="l">three <em style="font-style:normal;color:var(--cian)">steps.</em></span></p>
+    <p class="srv-p" data-i18n="i_p">Install Geode 5.11.2 or newer on Geometry Dash 2.2081 (Windows). Copy the .geode file into the game's geode/mods folder, or drag it onto the game, and restart.</p>
+    <ol class="pasos mono">
+      <li id="paso-1"><b data-i18n="i_1">Download</b><span data-i18n="i_1s">the .geode file</span></li>
+      <li id="paso-2"><b data-i18n="i_2">Install</b><span>geode/mods</span></li>
+      <li id="paso-3"><b data-i18n="i_3">Play</b><span data-i18n="i_3s">F6 strength · K panel</span></li>
+    </ol>
+  </div>
+</section>
 
-      <div class="scroll-hint" aria-hidden="true"><span class="chev"></span></div>
-    </section>
-
-    <!-- ============ STATS (solo datos verdaderos) ============ -->
-    <section class="stats">
-      <div class="stats-inner">
-        <div class="stat reveal"><div class="stat-value" data-target="2.208" data-decimals="3">2.208</div><div class="stat-label" data-i18n="stat_version">Versión compatible</div></div>
-        <div class="stat reveal" style="--d:.08s"><div class="stat-value">0 $</div><div class="stat-label" data-i18n="stat_free">Costo, siempre gratis</div></div>
-        <div class="stat reveal" id="dl-stat" style="--d:.16s" hidden><div class="stat-value" id="dl-count" data-target="0">0</div><div class="stat-label" data-i18n="stat_downloads">Descargas</div></div>
-        <div class="stat reveal" style="--d:.24s"><div class="stat-value">∞</div><div class="stat-label" data-i18n="stat_levels">Niveles por dominar</div></div>
-      </div>
-    </section>
-
-    <!-- ============ FEATURES ============ -->
-    <section class="section" id="features">
-      <div class="section-head reveal">
-        <div class="eyebrow" data-i18n="feat_eyebrow">Por qué Monster Input Buffer</div>
-        <h2 class="section-title" data-i18n="feat_title">Diseñado para que solo pienses en jugar.</h2>
-        <p class="section-sub" data-i18n="feat_sub">Sin configuraciones complicadas, sin tecnicismos. Instalás, jugás y sentís la diferencia.</p>
-      </div>
-      <div class="grid-3">
-        <article class="card tilt reveal">
-          <div class="card-icon">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 12l4-4"/><path d="M12 12l-4-4"/><circle cx="12" cy="12" r="2.2"/></svg>
-          </div>
-          <h3 data-i18n="f1_t">Precisión</h3>
-          <p data-i18n="f1_p">Tus clicks se registran cuando los querés. Menos saltos perdidos por milésimas de diferencia.</p>
-        </article>
-        <article class="card tilt reveal" style="--d:.1s">
-          <div class="card-icon">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg>
-          </div>
-          <h3 data-i18n="f2_t">Respuesta ágil</h3>
-          <p data-i18n="f2_p">Tu input se traduce rápido, sin esa sensación de pelear contra el juego.</p>
-        </article>
-        <article class="card tilt reveal" style="--d:.2s">
-          <div class="card-icon">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12c2.5-3 5-3 7.5 0s5 3 7.5 0 3-2 5 0"/><path d="M2 18c2.5-3 5-3 7.5 0s5 3 7.5 0 3-2 5 0"/></svg>
-          </div>
-          <h3 data-i18n="f3_t">Más fluidez</h3>
-          <p data-i18n="f3_p">Jugá más relajado. El ritmo del nivel manda, no la ansiedad por el timing.</p>
-        </article>
-      </div>
-    </section>
-
-    <!-- ============ SHOWCASE ============ -->
-    <section class="section" id="showcase">
-      <div class="split">
-        <div class="split-copy reveal">
-          <div class="eyebrow" data-i18n="show_eyebrow">La experiencia</div>
-          <h2 class="section-title" data-i18n="show_title">Menos pelea. Más flow.</h2>
-          <p data-i18n="show_p">
-            Olvidate de apretar el botón "por las dudas" y fallar igual. Monster Input Buffer
-            acompaña tu ritmo natural para que entres en ese estado donde el nivel fluye y vos solo seguís la música.
-          </p>
-          <div class="feature-chips">
-            <span class="chip" data-i18n="chip1">Sin configuración</span>
-            <span class="chip" data-i18n="chip2">Compatible 2.208</span>
-            <span class="chip" data-i18n="chip3">Ligero y limpio</span>
-            <span class="chip" data-i18n="chip4">Hecho por SuLawko</span>
-          </div>
-        </div>
-        <div class="visual reveal" style="--d:.15s" aria-hidden="true">
-          <div class="bars" id="bars"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ VIDEO (aparece solo si se configura YOUTUBE_ID) ============ -->
-    <section class="section" id="video" hidden>
-      <div class="section-head reveal">
-        <div class="eyebrow" data-i18n="vid_eyebrow">En acción</div>
-        <h2 class="section-title" data-i18n="vid_title">Mirá cómo funciona.</h2>
-      </div>
-      <div class="video-wrap reveal" id="video-slot"></div>
-    </section>
-
-    <!-- ============ INSTALACIÓN ============ -->
-    <section class="section" id="install">
-      <div class="section-head reveal">
-        <div class="eyebrow" data-i18n="inst_eyebrow">Instalación</div>
-        <h2 class="section-title" data-i18n="inst_title">Listo en tres pasos.</h2>
-        <p class="section-sub" data-i18n="inst_sub">Sin complicaciones. Si algo no sale, pasá por el Discord y te damos una mano.</p>
-      </div>
-      <div class="steps">
-        <article class="card step reveal">
-          <div class="step-num">1</div>
-          <h3 data-i18n="s1_t">Descargá el mod</h3>
-          <p data-i18n="s1_p">Bajá la última versión desde el botón de descarga. Siempre desde esta página o el repositorio oficial.</p>
-        </article>
-        <article class="card step reveal" style="--d:.1s">
-          <div class="step-num">2</div>
-          <h3 data-i18n="s2_t">Instalalo</h3>
-          <p data-i18n="s2_p">Seguí las instrucciones que vienen con el archivo para agregarlo a tu Geometry Dash 2.208.</p>
-        </article>
-        <article class="card step reveal" style="--d:.2s">
-          <div class="step-num">3</div>
-          <h3 data-i18n="s3_t">Abrí el juego y jugá</h3>
-          <p data-i18n="s3_p">Iniciá Geometry Dash, entrá a un nivel y sentí la diferencia desde el primer intento.</p>
-        </article>
-      </div>
-      <p class="req" data-i18n-html="req"><strong>Requisitos:</strong> Geometry Dash versión 2.208 en PC.</p>
-    </section>
-
-    <!-- ============ FAQ ============ -->
-    <section class="section" id="faq">
-      <div class="section-head reveal">
-        <div class="eyebrow" data-i18n="faq_eyebrow">Preguntas frecuentes</div>
-        <h2 class="section-title" data-i18n="faq_title">Lo que más preguntan.</h2>
-      </div>
-      <div class="faq reveal">
-        <details>
-          <summary data-i18n="q1">¿Es seguro?</summary>
-          <p data-i18n-html="a1">Es un mod no oficial hecho por SuLawko. Descargalo solo desde esta página o desde el <a href="https://github.com/sulawko/monster-input-buffer" target="_blank" rel="noopener">repositorio oficial</a> y, si se publica el hash SHA-256, comprobá que coincida con el de tu archivo. Si tu antivirus protesta con un mod, es normal que pase con este tipo de archivos: consultá en el Discord ante cualquier duda.</p>
-        </details>
-        <details>
-          <summary data-i18n="q2">¿Es trampa? ¿Puedo usarlo para mis records?</summary>
-          <p data-i18n="a2">Monster Input Buffer es un input buffer: ayuda con el timing de tus clicks. Las reglas sobre qué mods se aceptan para records o rankings las define cada comunidad, lista o moderador, así que consultalas antes de enviar un record. Para jugar y practicar, no hay problema.</p>
-        </details>
-        <details>
-          <summary data-i18n="q3">¿Me pueden banear por usarlo?</summary>
-          <p data-i18n="a3">No es un mod oficial de RobTop y no controlamos las reglas de terceros (listas, servidores o torneos). Usalo bajo tu propio criterio y revisá las reglas de donde vayas a competir.</p>
-        </details>
-        <details>
-          <summary data-i18n="q4">¿Es compatible con otros mods?</summary>
-          <p data-i18n="a4">Está pensado para Geometry Dash 2.208. Si notás un conflicto con otro mod, contanos cuál es en el Discord o abrí un reporte en GitHub y lo revisamos.</p>
-        </details>
-        <details>
-          <summary data-i18n="q5">No funciona, ¿qué hago?</summary>
-          <p data-i18n-html="a5">Comprobá que tu juego sea la versión 2.208 y que hayas seguido los pasos de instalación. Si sigue sin andar, <a href="https://discord.gg/XYz79HdKPS" target="_blank" rel="noopener">escribinos en el Discord</a> o <a href="https://github.com/sulawko/monster-input-buffer/issues" target="_blank" rel="noopener">abrí un reporte en GitHub</a>.</p>
-        </details>
-        <details>
-          <summary data-i18n="q6">¿Cuesta algo?</summary>
-          <p data-i18n="a6">No. Es gratis y lo va a seguir siendo.</p>
-        </details>
-      </div>
-    </section>
-
-    <!-- ============ CHANGELOG ============ -->
-    <section class="section" id="changelog">
-      <div class="section-head reveal">
-        <div class="eyebrow" data-i18n="log_eyebrow">Versiones</div>
-        <h2 class="section-title" data-i18n="log_title">Novedades.</h2>
-      </div>
-      <div class="changelog reveal">
-        <div class="rel">
-          <h3>v2.208 <small data-i18n="log_first">Primera versión pública</small></h3>
-          <ul>
-            <li data-i18n="log1">Lanzamiento del mod para Geometry Dash 2.208.</li>
-            <li data-i18n="log2">Los próximos cambios se van a publicar acá y en el Discord.</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ COMUNIDAD ============ -->
-    <section class="section" id="community">
-      <div class="card community-card reveal">
-        <div class="eyebrow" data-i18n="com_eyebrow">Comunidad</div>
-        <h2 class="section-title" data-i18n="com_title">Sumate, probalo y contanos.</h2>
-        <p data-i18n="com_p">Acá se comparten dudas, sugerencias y reportes. Tu feedback hace mejor al mod.</p>
-        <div class="row">
-          <a href="https://discord.gg/XYz79HdKPS" target="_blank" rel="noopener" class="btn btn-primary btn-sm" data-i18n="com_discord">Unirse al Discord</a>
-          <a href="https://github.com/sulawko/monster-input-buffer/issues" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" data-i18n="com_bug">Reportar un bug</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ CTA FINAL ============ -->
-    <section class="section" id="download">
-      <div class="cta-card reveal">
-        <div class="eyebrow" data-i18n="dl_eyebrow">Descarga</div>
-        <h2 data-i18n="dl_title">¿Listo para dominar el juego?</h2>
-        <p data-i18n="dl_p">Gratis y compatible con la versión 2.208 de Geometry Dash.</p>
-        <div class="cta-actions">
-          <a href="#download" id="dl-btn" class="btn btn-primary btn-lg btn-pulse">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
-            <span id="dl-label" data-i18n="dl_btn">Descargar Monster Input Buffer</span>
-          </a>
-          <a href="https://discord.gg/XYz79HdKPS" target="_blank" rel="noopener" class="btn btn-ghost btn-lg" data-i18n="com_discord">Unirse al Discord</a>
-        </div>
-        <p class="cta-meta" id="dl-meta" data-i18n="dl_meta">Geometry Dash 2.208</p>
-        <div class="hash-box" id="hash-box" hidden>
-          <span class="lbl">SHA-256</span>
-          <code id="hash-code"></code>
-          <button type="button" class="copy-btn" id="copy-hash" data-i18n="copy">Copiar</button>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- ============ FOOTER ============ -->
-  <footer>
-    <a href="#" class="logo"><span class="logo-mark">M</span><span>MONSTER <small>INPUT BUFFER</small></span></a>
-    <p class="tagline" data-i18n="foot_tag">Un mod de SuLawko para Geometry Dash.</p>
-    <div class="foot-links">
-      <a href="#features" data-i18n="nav_features">Características</a>
-      <a href="#install" data-i18n="nav_install">Instalación</a>
-      <a href="#faq" data-i18n="nav_faq">FAQ</a>
-      <a href="https://discord.gg/XYz79HdKPS" target="_blank" rel="noopener">Discord</a>
-      <a href="https://github.com/sulawko/monster-input-buffer" target="_blank" rel="noopener">GitHub</a>
-      <a href="#download" data-i18n="nav_download">Descargar</a>
+<!-- 6 · FAQ -->
+<section id="faq" aria-labelledby="faq-h">
+  <div>
+    <h2 class="sec" id="faq-h" data-i18n-html="f_h">What people<br><em>ask most.</em></h2>
+    <p class="lead" style="color:#4d4566" data-i18n="f_lead">No complicated setup, no jargon. If something goes wrong, drop by the Discord and we'll help.</p>
+    <div class="preguntas">
+      <details><summary><span data-i18n="q1">Is it safe?</span><span class="fl" aria-hidden="true">+</span></summary>
+        <p data-i18n-html="a1">It is an unofficial mod made by SuLawko. Download it only from this page or the <a href="https://github.com/sulawko/monster-input-buffer" target="_blank" rel="noopener">official repository</a> and, if the SHA-256 hash is published, check it matches your file. If your antivirus complains, that is common with this kind of file: ask on Discord if in doubt.</p></details>
+      <details><summary><span data-i18n="q2">Is it cheating? Can I use it for records?</span><span class="fl" aria-hidden="true">+</span></summary>
+        <p data-i18n="a2">Monster Input Buffer is an input buffer: it helps with the timing of your clicks. Which mods are accepted for records or rankings is decided by each community, list or moderator, so check their rules before submitting a record. For playing and practicing, no problem.</p></details>
+      <details><summary><span data-i18n="q3">Can I get banned for using it?</span><span class="fl" aria-hidden="true">+</span></summary>
+        <p data-i18n="a3">It is not an official RobTop mod and we do not control third-party rules (lists, servers or tournaments). Use it at your own discretion and check the rules wherever you plan to compete.</p></details>
+      <details><summary><span data-i18n="q4">Is it compatible with other mods?</span><span class="fl" aria-hidden="true">+</span></summary>
+        <p data-i18n="a4">It is made for Geometry Dash 2.208. If you notice a conflict with another mod, tell us which one on Discord or open a report on GitHub and we will look into it.</p></details>
+      <details><summary><span data-i18n="q5">It doesn't work, what do I do?</span><span class="fl" aria-hidden="true">+</span></summary>
+        <p data-i18n-html="a5">Make sure your game is version 2.208 and that you followed the install steps. If it still doesn't work, <a href="https://discord.gg/XYz79HdKPS" target="_blank" rel="noopener">write to us on Discord</a> or <a href="https://github.com/sulawko/monster-input-buffer/issues" target="_blank" rel="noopener">open a report on GitHub</a>.</p></details>
+      <details><summary><span data-i18n="q6">Does it cost anything?</span><span class="fl" aria-hidden="true">+</span></summary>
+        <p data-i18n="a6">No. It is free and it will stay that way.</p></details>
     </div>
-    <p class="disclaimer" data-i18n-html="disc">
-      Monster Input Buffer es un mod no oficial creado por <strong>SuLawko</strong>. © 2026 SuLawko. Todos los derechos reservados: no se permite redistribuirlo ni publicarlo con otro nombre o autor.<br />
-      Geometry Dash © RobTop Games. Todas las marcas pertenecen a sus respectivos dueños.
-    </p>
-  </footer>
+  </div>
+  <div class="lado">
+    <div class="diagrama" aria-hidden="true">
+      <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet">
+        <line class="dib" x1="20" y1="220" x2="380" y2="220"/>
+        <path class="dib" d="M130 220 L150 180 L170 220"/>
+        <path class="dib" d="M290 220 L300 206 L310 220"/>
+        <path class="tenue crudo" d="M80 220 Q185 -30 290 220" stroke-dasharray="4 5"/>
+        <path class="tenue crudo" d="M286 208 L298 220 M298 208 L286 220"/>
+        <path class="dib bueno" d="M96 220 Q206 -30 316 220"/>
+        <rect class="pta" x="52" y="206" width="14" height="14"/>
+        <line class="dib" x1="60" y1="250" x2="140" y2="250"/>
+        <path class="dib" d="M80 243V257 M84.2 246V254 M88.3 246V254 M92.5 246V254 M96.7 243V257 M100.8 246V254 M105 246V254 M109.2 246V254 M113.3 243V257"/>
+        <text x="62" y="276">click</text>
+        <text x="86" y="236">+3t</text>
+        <text x="226" y="118">SAVED</text>
+        <text x="300" y="276">240 Hz</text>
+      </svg>
+    </div>
+    <div class="nota">
+      <p class="mono"><b style="color:#0a0714">v2.208</b> · <span data-i18n="log_first">First public release</span></p>
+      <ul><li data-i18n="log1">Launch of the mod for Geometry Dash 2.208.</li><li data-i18n="log2">Future changes will be posted here and on Discord.</li></ul>
+    </div>
+    <div class="nota">
+      <h3 data-i18n="c_t">Join in, try it and tell us.</h3>
+      <p data-i18n="c_p">Questions, suggestions and reports are shared here. Your feedback makes the mod better.</p>
+      <div class="fila-btn"><a class="btn" href="https://discord.gg/XYz79HdKPS" target="_blank" rel="noopener" data-i18n="c_dc">Join the Discord</a><a class="btn" href="https://github.com/sulawko/monster-input-buffer/issues" target="_blank" rel="noopener" data-i18n="c_bug">Report a bug</a></div>
+    </div>
+  </div>
+</section>
 
-  <script>
-    /* ============ Fondo de partículas ============ */
-    const canvas = document.getElementById('bg');
-    const ctx = canvas.getContext('2d');
-    const COLORS = ['#a855f7', '#c084fc', '#7c3aed', '#b026ff'];
-    let w, h, particles = [];
+<!-- 7 · DESCARGA + PIE -->
+<section id="descarga" aria-labelledby="dl-h">
+  <div>
+    <h2 class="sec" id="dl-h" data-i18n-html="dl_h">Ready to<br><em>master the game?</em></h2>
+    <p class="lead" data-i18n="dl_lead">Free and compatible with Geometry Dash 2.208. Download it only from this page or the official repository, and check the SHA-256 if you want to be sure.</p>
+    <dl class="teclas mono">
+      <div><dt>F6</dt><dd data-i18n="k_f6">Cycles the strength: 0.5f → 1f → 2f → 4f → 6f → 8f → custom → off</dd></div>
+      <div><dt>K</dt><dd data-i18n="k_k">Shows or hides the log panel inside a level</dd></div>
+    </dl>
+  </div>
+  <div class="panel">
+    <div class="campo"><span class="eti" data-i18n="p_arch">File</span><span class="val">sulawko.monster-input-buffer.geode</span></div>
+    <div class="campo"><span class="eti" data-i18n="p_ver">Version</span><span class="val">v4.0.4</span></div>
+    <div class="campo"><span class="eti" data-i18n="p_req">Requirements</span><span class="val">Geode ≥ 5.11.2 · Geometry Dash 2.2081 · Windows</span></div>
+    <div class="campo"><span class="eti">SHA-256</span><code id="sha"></code></div>
+    <div class="calc">
+      <div><b>0 $</b><span class="mono" data-i18n="p_c1">cost</span></div>
+      <div><b>240 Hz</b><span class="mono" data-i18n="p_c2">tick rate</span></div>
+      <div><b>2–32 t</b><span class="mono" data-i18n="p_c3">F6 range</span></div>
+    </div>
+    <div class="fila-btn">
+      <a class="btn lleno" id="dl-btn" href="https://github.com/sulawko/monster-input-buffer/releases/download/v4.0.4/sulawko.monster-input-buffer.geode" download data-i18n="p_dl">Download Monster Input Buffer</a>
+      <button class="btn" type="button" id="copiar" data-i18n="p_copiar">Copy hash</button>
+      <a class="btn" href="https://discord.gg/XYz79HdKPS" target="_blank" rel="noopener" data-i18n="c_dc">Join the Discord</a>
+    </div>
+  </div>
+</section>
 
-    function resize() {
-      w = canvas.width = window.innerWidth;
-      h = canvas.height = window.innerHeight;
+<footer aria-label="Footer">
+  <div class="poster" aria-hidden="true"></div>
+  <div class="pie-velo" aria-hidden="true"></div>
+  <p class="disc" data-i18n-html="disc">Monster Input Buffer is an unofficial mod made by <strong>SuLawko</strong>, not affiliated with RobTop Games or the Geode team. © 2026 SuLawko. All rights reserved: redistribution or republishing under another name or author is not allowed. Geometry Dash © RobTop Games. All trademarks belong to their respective owners.</p>
+  <div class="marquesina" aria-hidden="true"><div>Monster · <em>Input Buffer</em> · 2.208 · SuLawko · Monster · <em>Input Buffer</em> · 2.208 · SuLawko · </div></div>
+  <div class="pie">
+    <div class="mono">Monster Input Buffer<br><span data-i18n="pie_1">An unofficial mod by SuLawko</span><br>© 2026 SuLawko · <span id="pie-hora">--:--</span> UTC</div>
+    <ul class="mono"><li><a href="https://discord.gg/XYz79HdKPS" target="_blank" rel="noopener">Discord</a></li><li><a href="https://github.com/sulawko/monster-input-buffer" target="_blank" rel="noopener">GitHub</a></li><li><a href="https://github.com/sulawko/monster-input-buffer/issues" target="_blank" rel="noopener" data-i18n="c_bug">Report a bug</a></li></ul>
+    <ul class="mono"><li><a href="#zoom" data-i18n="n_zoom">Zoom</a></li><li><a href="#demo" data-i18n="n_demo">Demo</a></li><li><a href="#faq">FAQ</a></li><li><a href="#descarga" data-i18n="n_descargar">Download</a></li></ul>
+  </div>
+</footer>
+</main>
+
+<script type="module">
+import * as THREE from "three";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+// ---------- Configuración: lo único que hay que tocar al sacar una versión nueva ----------
+const CONFIG = {
+  // URL directa del archivo del mod (un Release de GitHub)
+  DOWNLOAD_URL: "https://github.com/sulawko/monster-input-buffer/releases/download/v4.0.4/sulawko.monster-input-buffer.geode",
+  // Hash SHA-256 del archivo, para que la gente verifique la descarga
+  SHA256: "8be8532d910abad96bb3594c0137b79b5c70046972cef67e5e31133fe35b0abc",
+  REPO: "sulawko/monster-input-buffer",
+  OG: "https://sulawko.github.io/monster-input-buffer/og-image.png?v=2",
+};
+
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const COL = { acento: css("--acento") || "#a855f7", cian: css("--cian") || "#3be8ff", silicio: css("--silicio") || "#9b93b4" };
+const reducido = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const tactil = matchMedia("(hover: none), (pointer: coarse)").matches;
+const movil = () => innerWidth < 821;
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const TICK = 1000 / 240, FRAME = 1000 / 60;   // 1 tick = 0,25 frames
+let idioma = "en";
+const fmt = (n, d = 0) => { const [e, f] = Math.abs(n).toFixed(d).split("."); const mil = idioma === "es" ? "." : ",", dec = idioma === "es" ? "," : ".";
+  return (n < 0 ? "−" : "") + e.replace(/\B(?=(\d{3})+(?!\d))/g, mil) + (f ? dec + f : ""); };
+const firmado = (n, d = 1) => (n >= 0 ? "+" : "") + fmt(n, d);
+const rgba = (hex, a) => { const n = parseInt(hex.replace("#", ""), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; };
+gsap.registerPlugin(ScrollTrigger, ScrambleTextPlugin);
+if (!tactil) document.body.classList.add("puntero-ok");
+
+// ---------- Reloj único de scroll: Lenis alimenta ScrollTrigger ----------
+const lenis = new Lenis({ lerp: 0.09, wheelMultiplier: 1, smoothWheel: !reducido });
+lenis.on("scroll", ScrollTrigger.update);
+gsap.ticker.add((t) => lenis.raf(t * 1000));
+gsap.ticker.lagSmoothing(0);
+for (const a of $$('a[href^="#"]')) a.addEventListener("click", (e) => {
+  const el = $(a.getAttribute("href")); if (!el) return; e.preventDefault(); lenis.scrollTo(el, { duration: 1.4, easing: (x) => 1 - Math.pow(1 - x, 4) });
+});
+
+// ---------- Muelle (tensión 170, fricción 26): el único integrador de la pieza ----------
+class Muelle {
+  constructor(k = 170, c = 26, x = 0) { this.k = k; this.c = c; this.x = x; this.v = 0; this.o = x; }
+  paso(dt) { const f = -this.k * (this.x - this.o) - this.c * this.v; this.v += f * dt; this.x += this.v * dt; return this.x; }
+}
+
+// ---------- Puntero y cursor ----------
+const P = { x: 0, y: 0, nx: 0, ny: 0, activo: false, ultimo: 0 };
+const cursorEl = $(".cursor");
+addEventListener("pointermove", (e) => {
+  P.x = e.clientX; P.y = e.clientY; P.nx = e.clientX / innerWidth * 2 - 1; P.ny = e.clientY / innerHeight * 2 - 1;
+  P.activo = true; P.ultimo = performance.now();
+  cursorEl.style.transform = `translate(${P.x}px,${P.y}px) translate(-50%,-50%)`;
+}, { passive: true });
+addEventListener("pointerleave", () => { P.activo = false; });
+
+// ---------- Soporte WebGL ----------
+const canvas = $("#gl");
+let renderer = null;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" }); } catch (e) { renderer = null; }
+const hayGL = !!renderer && !!renderer.getContext();
+if (!hayGL) { document.body.classList.add("no-webgl", "estatico"); canvas.remove(); $("#hero .poster img").src = CONFIG.OG; }
+if (reducido) document.body.classList.add("estatico");
+
+// ---------- Textos en dos idiomas (inglés por defecto, como la web actual) ----------
+const ES = {
+  in_1: "Calibrando input · 240 ticks/s", in_2: "Tocá cualquier tecla<br>para saltar",
+  n_zoom: "Zoom", n_demo: "Demo", n_cifras: "Cifras", n_instalar: "Instalar", n_descargar: "Descargar",
+  h_tl: "Geometry Dash 2.208 · Geode<br><b>Gratis, siempre</b>", h_tr: "1 tick = 0,25 frames · <b>240 Hz</b><br>Hecho por SuLawko",
+  h_p: "<b>Un mod de SuLawko</b> para que jugar se sienta mucho más fácil. Olvidate del timing frustrante: Monster Input Buffer acorta la distancia entre tu mano y el juego para que cada salto caiga cuando lo pensaste.",
+  h_dl: "Descargar ahora", h_ver: "Ver cómo se siente", h_hora: "Hora UTC", h_incl: "Inclinación", h_hint: "Mové el cursor · bajá para entrar en un click ↓",
+  z_aum: "Aumento",
+  d_h: "Probalo<br>en <em>vivo.</em>",
+  d_lead: "Tocá Saltar (o la barra espaciadora) cuando el pincho llegue a la línea, y después probá apurarte un poco. Con el buffer activado, los clicks tempranos se salvan. Es una simulación en tu navegador con el ritmo real de ticks del mod (240 por segundo); la ventana real depende del nivel y del modo de juego.",
+  d_fuerza: "Fuerza · F6", d_saltar: "Saltar", d_espacio: "Espacio", d_s1: "clicks salvados", d_s2: "último desfase", d_s3: "ventana del buffer",
+  m_h: "Cifras<br>de <em>verdad.</em>", m_1: "Versión de Geometry Dash", m_2: "Costo, siempre gratis", m_4: "Ticks por segundo · 1 tick = 0,25 frames",
+  m_lead: "La fuerza se cambia con F6 dentro del juego: 0,5f → 1f → 2f → 4f → 6f → 8f → personalizada → off. Es lo máximo que el mod puede retener un click temprano. La nave nunca se toca y el spam rápido de wave se deja tranquilo.",
+  r1_t: "Precisión", r1_p: "Tus clicks se registran cuando los querés. Menos saltos perdidos por milésimas de diferencia.",
+  r2_t: "Respuesta ágil", r2_p: "Tu input se traduce rápido, sin esa sensación de pelear contra el juego.",
+  r3_t: "Más fluidez", r3_p: "Jugá más relajado. El ritmo del nivel manda, no la ansiedad por el timing.",
+  mo_1: "<b>Simula</b> · Cubo · Bola · UFO · Araña · Robot · Swing · Wave", mo_2: "<b>También</b> · Orbes · Pads · Portales de gravedad · Portales de velocidad",
+  i_p: "Instalá Geode 5.11.2 o superior en Geometry Dash 2.2081 (Windows). Copiá el archivo .geode en la carpeta geode/mods del juego, o arrastralo al juego, y reiniciá.",
+  i_1: "Descargá", i_1s: "el archivo .geode", i_2: "Instalá", i_3: "Jugá", i_3s: "F6 fuerza · K panel",
+  f_h: "Lo que más<br><em>preguntan.</em>", f_lead: "Sin configuraciones complicadas, sin tecnicismos. Si algo no sale, pasá por el Discord y te damos una mano.",
+  q1: "¿Es seguro?",
+  a1: 'Es un mod no oficial hecho por SuLawko. Descargalo solo desde esta página o desde el <a href="https://github.com/sulawko/monster-input-buffer" target="_blank" rel="noopener">repositorio oficial</a> y, si se publica el hash SHA-256, comprobá que coincida con el de tu archivo. Si tu antivirus protesta con un mod, es normal que pase con este tipo de archivos: consultá en el Discord ante cualquier duda.',
+  q2: "¿Es trampa? ¿Puedo usarlo para mis records?",
+  a2: "Monster Input Buffer es un input buffer: ayuda con el timing de tus clicks. Las reglas sobre qué mods se aceptan para records o rankings las define cada comunidad, lista o moderador, así que consultalas antes de enviar un record. Para jugar y practicar, no hay problema.",
+  q3: "¿Me pueden banear por usarlo?",
+  a3: "No es un mod oficial de RobTop y no controlamos las reglas de terceros (listas, servidores o torneos). Usalo bajo tu propio criterio y revisá las reglas de donde vayas a competir.",
+  q4: "¿Es compatible con otros mods?",
+  a4: "Está pensado para Geometry Dash 2.208. Si notás un conflicto con otro mod, contanos cuál es en el Discord o abrí un reporte en GitHub y lo revisamos.",
+  q5: "No funciona, ¿qué hago?",
+  a5: 'Comprobá que tu juego sea la versión 2.208 y que hayas seguido los pasos de instalación. Si sigue sin andar, <a href="https://discord.gg/XYz79HdKPS" target="_blank" rel="noopener">escribinos en el Discord</a> o <a href="https://github.com/sulawko/monster-input-buffer/issues" target="_blank" rel="noopener">abrí un reporte en GitHub</a>.',
+  q6: "¿Cuesta algo?", a6: "No. Es gratis y lo va a seguir siendo.",
+  log_first: "Primera versión pública", log1: "Lanzamiento del mod para Geometry Dash 2.208.", log2: "Los próximos cambios se van a publicar acá y en el Discord.",
+  c_t: "Sumate, probalo y contanos.", c_p: "Acá se comparten dudas, sugerencias y reportes. Tu feedback hace mejor al mod.", c_dc: "Unirse al Discord", c_bug: "Reportar un bug",
+  dl_h: "¿Listo para<br><em>dominar el juego?</em>",
+  dl_lead: "Gratis y compatible con Geometry Dash 2.208. Descargalo solo desde esta página o el repositorio oficial, y comprobá el SHA-256 si querés estar seguro.",
+  k_f6: "Cambia la fuerza: 0,5f → 1f → 2f → 4f → 6f → 8f → personalizada → off", k_k: "Muestra u oculta el panel de log dentro de un nivel",
+  p_arch: "Archivo", p_ver: "Versión", p_req: "Requisitos", p_c1: "costo", p_c2: "ticks por segundo", p_c3: "rango de F6",
+  p_dl: "Descargar Monster Input Buffer", p_copiar: "Copiar hash",
+  pie_1: "Mod no oficial de SuLawko",
+  disc: "Monster Input Buffer es un mod no oficial creado por <strong>SuLawko</strong>, sin relación con RobTop Games ni con el equipo de Geode. © 2026 SuLawko. Todos los derechos reservados: no se permite redistribuirlo ni publicarlo con otro nombre o autor. Geometry Dash © RobTop Games. Todas las marcas pertenecen a sus respectivos dueños.",
+};
+const nodosI18n = $$("[data-i18n], [data-i18n-html]");
+const EN = {};
+for (const el of nodosI18n) { if (el.dataset.i18n) EN[el.dataset.i18n] ??= el.textContent; if (el.dataset.i18nHtml) EN[el.dataset.i18nHtml] ??= el.innerHTML.trim(); }
+const tx = (k) => (idioma === "es" ? ES[k] : EN[k]) ?? EN[k] ?? k;
+const STR = {
+  en: {
+    titulo: "Monster Input Buffer — Never lose a run to an early click", cursor: "tilt", lang: "ES", langAria: "Cambiar a español",
+    srv: ["Ready in", 'three <em style="font-style:normal;color:var(--cian)">steps.</em>'],
+    etapas: ["Attempt · 60 s", "Section · 2 s", "Jump · 200 ms", "Frame · 16.7 ms", "Tick · 4.17 ms"],
+    frases: [
+      "A whole attempt: 60 seconds of level. The music leads and every mark is an obstacle.",
+      "One section, two jumps. Click a little early and the cube lands right on the spike.",
+      "The prediction horizon: 48 ticks. Two ghost players try your click a few ticks later.",
+      "One frame at 60 fps is 4 ticks. Your click came 3 ticks early: the mod holds it and delivers it on time.",
+      "One tick: 0.25 frames. The jump fires here and the run goes on. SAVED press +3t.",
+    ],
+    espera: "Waiting for your click…", ok: "✓ on time", temprano: "✕ too early", tarde: "✕ too late", sinBuffer: "buffer off", apagado: "off",
+    descargas: "Downloads", niveles: "Levels to conquer", ticks: "ticks", copiado: "Copied!",
+    graf: "Bar chart: maximum delay per F6 strength, from 0.5 frames (2 ticks, 8.3 ms) to 8 frames (32 ticks, 133.3 ms)",
+  },
+  es: {
+    titulo: "Monster Input Buffer — No pierdas una run por un click temprano", cursor: "inclinar", lang: "EN", langAria: "Switch to English",
+    srv: ["Listo en", 'tres <em style="font-style:normal;color:var(--cian)">pasos.</em>'],
+    etapas: ["Intento · 60 s", "Sección · 2 s", "Salto · 200 ms", "Frame · 16,7 ms", "Tick · 4,17 ms"],
+    frases: [
+      "Un intento entero: 60 segundos de nivel. La música manda y cada marca es un obstáculo.",
+      "Una sección, dos saltos. Si tocás un poco antes, el cubo cae justo sobre el pincho.",
+      "El horizonte de predicción: 48 ticks. Dos jugadores fantasma prueban tu click unos ticks más tarde.",
+      "Un frame a 60 fps son 4 ticks. Tu click llegó 3 ticks antes: el mod lo retiene y lo entrega a tiempo.",
+      "Un tick: 0,25 frames. Acá sale el salto y la run sigue. SAVED press +3t.",
+    ],
+    espera: "Esperando tu click…", ok: "✓ a tiempo", temprano: "✕ muy temprano", tarde: "✕ tarde", sinBuffer: "buffer apagado", apagado: "off",
+    descargas: "Descargas", niveles: "Niveles por dominar", ticks: "ticks", copiado: "¡Copiado!",
+    graf: "Gráfico de barras: retraso máximo por fuerza de F6, de 0,5 frames (2 ticks, 8,3 ms) a 8 frames (32 ticks, 133,3 ms)",
+  },
+};
+const L = () => STR[idioma];
+
+// ---------- Titulares: entrada por letras con desenfoque ----------
+function partir(el) {
+  const l = el.querySelector(".l"); if (!l || l.dataset.ok) return [];
+  const nodos = [];
+  const recorrer = (n, dest) => {
+    for (const c of [...n.childNodes]) {
+      if (c.nodeType === 3) { for (const ch of c.textContent) { const s = document.createElement("span"); s.textContent = ch; dest.appendChild(s); if (ch !== " ") nodos.push(s); } }
+      else { const w = document.createElement(c.tagName.toLowerCase()); w.style.cssText = c.style.cssText; w.className = c.className; dest.appendChild(w); recorrer(c, w); }
     }
-    function spawn(anywhere) {
-      return {
-        x: Math.random() * w,
-        y: anywhere ? Math.random() * h : h + 20,
-        r: Math.random() * 2 + 0.5,
-        vy: -(Math.random() * 0.4 + 0.1),
-        vx: (Math.random() - 0.5) * 0.15,
-        a: Math.random() * 0.5 + 0.15,
-        phase: Math.random() * Math.PI * 2,
-        speed: Math.random() * 0.02 + 0.005,
-        color: COLORS[(Math.random() * COLORS.length) | 0]
-      };
+  };
+  const copia = document.createElement("span"); copia.className = "l"; recorrer(l, copia); l.replaceWith(copia); copia.dataset.ok = "1";
+  return nodos;
+}
+const letrasT1 = partir($("#t1")), letrasT2 = partir($("#t2"));
+let letrasS1 = [], letrasS2 = [], instEntro = false;
+const entradaLetras = (letras, retardo = 0) => reducido ? gsap.set(letras, { opacity: 1 }) :
+  gsap.fromTo(letras, { opacity: 0, y: 46, filter: "blur(14px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9, ease: "power3.out", stagger: 0.032, delay: retardo, overwrite: true });
+gsap.set([...letrasT1, ...letrasT2], { opacity: 0 });
+function partirInstalar() {
+  const [a, b] = L().srv;
+  $(".srv-t1").innerHTML = `<span class="l">${a}</span>`; $(".srv-t2").innerHTML = `<span class="l">${b}</span>`;
+  letrasS1 = partir($(".srv-t1")); letrasS2 = partir($(".srv-t2"));
+  gsap.set([...letrasS1, ...letrasS2], { opacity: instEntro ? 1 : 0 });
+}
+
+// ---------- Intro: la retícula de ticks se calibra (≤ 2,4 s, se salta con tecla o toque) ----------
+const intro = $("#intro");
+let introHecha = false;
+function acabarIntro() {
+  if (introHecha) return; introHecha = true;
+  entradaLetras(letrasT1, 0.1); entradaLetras(letrasT2, 0.35);
+  gsap.to([".hero-p", ".hero-cta"], { opacity: 1, duration: 1, delay: 0.7, stagger: 0.12 });
+  if (ESC.cubo) ESC.cubo.entrada = 0;
+  gsap.to(intro, { clipPath: "inset(0 0 0 100%)", duration: 0.7, ease: "power4.inOut", onComplete: () => intro.remove() });
+  cursorEl.classList.add("visible");
+}
+if (reducido || !intro.isConnected) { intro.remove(); introHecha = true; gsap.set([...letrasT1, ...letrasT2], { opacity: 1 }); gsap.set([".hero-p", ".hero-cta"], { opacity: 1 }); }
+else {
+  const tl = gsap.timeline({ onComplete: acabarIntro });
+  tl.to("#intro .ret", { opacity: 1, duration: 0.5, ease: "power2.out" }, 0)
+    .to("#intro .marca span", { opacity: 1, filter: "blur(0px)", y: 0, duration: 0.7, stagger: 0.05, ease: "power3.out" }, 0.1)
+    .fromTo("#intro .barra", { y: -4 }, { y: innerHeight + 8, duration: 1.15, ease: "power1.inOut" }, 0.15)
+    .to({ v: 0 }, { v: 100, duration: 1.15, ease: "none", onUpdate() { $("#intro-pct").textContent = `${Math.round(this.targets()[0].v)} %`; } }, 0.15)
+    .to("#intro .ret", { backgroundSize: "1.2vw 1.2vw", opacity: 0.35, duration: 0.5, ease: "power2.in" }, 1.0);
+  const saltar = () => { if (!introHecha) { tl.kill(); acabarIntro(); } };
+  addEventListener("keydown", saltar, { once: true }); addEventListener("pointerdown", saltar, { once: true });
+  setTimeout(saltar, 2400);
+}
+
+// ---------- HUD en vivo ----------
+const hora = () => new Date().toLocaleTimeString("en-GB", { timeZone: "UTC", hour12: false });
+const ticHora = () => { $("#hud-hora").textContent = hora(); $("#pie-hora").textContent = hora().slice(0, 5); };
+ticHora(); setInterval(ticHora, 1000);
+
+// ---------- Escenas ----------
+const ESC = { etapa: "hero", cubo: null, zoom: null, inst: null, pie: { px: new Muelle(50, 12), py: new Muelle(50, 12) }, t: 0 };
+let W = innerWidth, H = innerHeight, DPR = 1;
+if (hayGL) {
+  DPR = Math.min(devicePixelRatio || 1, movil() ? 1.5 : 2);
+  renderer.setPixelRatio(DPR);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.setClearColor(0x000000, 0);
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;   // un solo mapa (el foco de la instalación)
+}
+// Los shaders a pantalla completa no pasan por el tonemapping: reciben el color tal cual está en CSS.
+const colPlano = (hex) => new THREE.Color().setStyle(hex, THREE.LinearSRGBColorSpace);
+let salaEnv = null;
+const entorno = () => { if (!salaEnv) { const pm = new THREE.PMREMGenerator(renderer); salaEnv = pm.fromScene(new RoomEnvironment(), 0.04).texture; pm.dispose(); } return salaEnv; };
+
+// ===== Escena A · el cubo (material físico, iridiscencia y difracción con onBeforeCompile) =====
+const uCubo = { uTiempo: { value: 0 }, uDifr: { value: 1.5 }, uDifFreq: { value: 3.6 }, uAcentoCol: { value: new THREE.Color(COL.acento) } };
+function texturaCara() {
+  const S = 512, c = document.createElement("canvas"); c.width = c.height = S; const x = c.getContext("2d");
+  x.fillStyle = "#000"; x.fillRect(0, 0, S, S);
+  x.strokeStyle = "#fff"; x.lineWidth = 12; x.strokeRect(78, 78, S - 156, S - 156);
+  x.lineWidth = 5; x.strokeRect(160, 160, S - 320, S - 320);
+  x.fillStyle = "#fff"; x.fillRect(S / 2 - 30, S / 2 - 30, 60, 60);
+  x.lineWidth = 3;
+  for (let i = 0; i < 25; i++) { const p = 78 + (S - 156) * i / 24; x.beginPath(); x.moveTo(p, 34); x.lineTo(p, i % 4 ? 48 : 60); x.stroke(); }   // regla de ticks
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
+}
+function crearCubo() {
+  const esc = new THREE.Scene(); esc.environment = entorno(); esc.environmentIntensity = 0.9;
+  const cam = new THREE.PerspectiveCamera(30, W / H, 0.1, 60); cam.position.set(0, 0.9, 8.1);
+  const pivote = new THREE.Group(); esc.add(pivote);
+  const l1 = new THREE.PointLight(COL.cian, 40, 0, 2); l1.position.set(-3.5, 2.5, 3);
+  const l2 = new THREE.PointLight(COL.acento, 60, 0, 2); l2.position.set(3, -1.5, 2.5);
+  const l3 = new THREE.DirectionalLight(0xffffff, 1.2); l3.position.set(1, 3, 4);
+  esc.add(l1, l2, l3);
+  const cara = texturaCara();
+  const mat = new THREE.MeshPhysicalMaterial({
+    color: 0x7c4fe0, metalness: 0.55, roughness: 0.18, iridescence: 1, iridescenceIOR: 1.4, iridescenceThicknessRange: [220, 780],
+    clearcoat: 1, clearcoatRoughness: 0.06, envMapIntensity: 1.5, emissive: new THREE.Color(COL.acento), emissiveMap: cara, emissiveIntensity: 1.4,
+  });
+  // Difracción: bandas de arcoíris que corren por las caras al inclinar el cubo.
+  mat.onBeforeCompile = (sh) => {
+    Object.assign(sh.uniforms, uCubo);
+    sh.fragmentShader = sh.fragmentShader
+      .replace("#include <common>", `#include <common>\nuniform float uTiempo, uDifr, uDifFreq; uniform vec3 uAcentoCol;`)
+      .replace("#include <opaque_fragment>", `
+  vec3 vDir = normalize(vViewPosition);
+  vec3 rfl = reflect(-vDir, normal);
+  float s1 = pow(max(0.0, dot(rfl, normalize(vec3(-0.35, 0.78, 0.5)))), 12.0);
+  float s2 = pow(max(0.0, dot(rfl, normalize(vec3(0.5, 0.62, 0.6)))), 16.0);
+  float s3 = pow(max(0.0, dot(rfl, normalize(vec3(-0.9, 0.2, 0.35)))), 12.0);
+  float s4 = pow(max(0.0, dot(rfl, normalize(vec3(0.1, 0.35, 0.93)))), 6.0);
+  float fase = (rfl.x * 0.9 + rfl.y * 0.35) * uDifFreq + uTiempo * 0.04;
+  vec3 arco = 0.5 + 0.5 * cos(6.2832 * (fase + vec3(0.0, 0.33, 0.67)));
+  float fres = pow(1.0 - max(0.0, dot(vDir, normal)), 2.2);
+  outgoingLight += arco * (s1 * 1.2 + s2 * 0.9 + s4 * 0.35) * uDifr * (0.3 + 0.7 * fres);
+  outgoingLight += uAcentoCol * s3 * 0.55;
+  #include <opaque_fragment>`);
+  };
+  const cubo = new THREE.Mesh(new RoundedBoxGeometry(1.7, 1.7, 1.7, 6, 0.2), mat); pivote.add(cubo);
+  // los dos jugadores fantasma: aristas cian que siguen al cubo con retraso
+  const bordes = new THREE.EdgesGeometry(new THREE.BoxGeometry(1.7, 1.7, 1.7));
+  const fantasmas = [0.5, 0.26].map((op) => { const m = new THREE.LineSegments(bordes, new THREE.LineBasicMaterial({ color: COL.cian, transparent: true, opacity: op, depthWrite: false })); m.userData.op = op; esc.add(m); return m; });
+  return { esc, cam, pivote, fantasmas, entrada: introHecha ? 0 : -1, sx: new Muelle(170, 26), sy: new Muelle(170, 26),
+    fx: [new Muelle(90, 19), new Muelle(50, 14)], fy: [new Muelle(90, 19), new Muelle(50, 14)] };
+}
+
+// ===== Escena B · el zoom en el tiempo (un solo ShaderMaterial a pantalla completa) =====
+// La escala es uLog = log10 del ancho de pantalla en milisegundos: de un intento de 60 s a un tick de 4,17 ms.
+const ZOOM_FRAG = `
+precision highp float;
+uniform vec2 uRes; uniform float uLog, uTiempo, uPulsos, uFlood, uEntrada, uMarcas; uniform vec2 uPuntero;
+uniform vec3 uCian, uAcentoCol, uSilicio;
+const float T0 = 31000.0;          // ms: el click dentro del intento (múltiplo de tick, frame y pulso)
+const float TICK = 4.1666667;      // 240 Hz
+const float FRAME = 16.666667;     // 60 fps
+const float BEAT = 500.0;          // 120 BPM
+const float SUELO = -0.1;
+const float DEL = 12.5;            // el mod entrega el click 3 ticks después
+const float SALTO = 420.0;
+const float ALTO = 0.44;
+float hash11(float n){ return fract(sin(n * 127.1 + 11.3) * 43758.5453); }
+float hash21(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
+float ruido1(float x){ float i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f); return mix(hash11(i), hash11(i + 1.0), f); }
+float luma(vec3 c){ return dot(c, vec3(0.299, 0.587, 0.114)); }
+float ventana(float lg, float hi, float lo){ return smoothstep(hi + 0.35, hi - 0.35, lg) * smoothstep(lo - 0.35, lo + 0.35, lg); }
+float vlin(float d, float d0, float px, float aa){ return 1.0 - smoothstep(px * 0.5 * aa, (px * 0.5 + 1.0) * aa, abs(d - d0)); }
+float hlin(float y, float y0, float px, float ay){ return 1.0 - smoothstep(px * 0.5 * ay, (px * 0.5 + 1.0) * ay, abs(y - y0)); }
+float rej(float d, float P, float px, float aa){ float m = mod(d, P); return 1.0 - smoothstep(px * 0.5 * aa, (px * 0.5 + 1.0) * aa, min(m, P - m)); }
+float arco(float d, float s){ float u = (d - s) / SALTO; return (u < 0.0 || u > 1.0) ? -1.0 : SUELO + ALTO * u * (1.0 - u); }
+float trazo(float y, float yA, float px, float ay){ return yA < -0.9 ? 0.0 : 1.0 - smoothstep(px * 0.5 * ay, (px * 0.5 + 1.0) * ay, abs(y - yA)); }
+vec2 pincho(float t, float y, float c, float hw, float h, float ay){
+  float lx = (t - c) / hw; float dentro = step(abs(lx), 1.0);
+  float e = SUELO + h * (1.0 - abs(lx)) - y;
+  return vec2(dentro * smoothstep(-ay, ay, e) * step(SUELO, y), dentro * (1.0 - smoothstep(0.0, 2.0 * ay, abs(e))) * step(SUELO - ay, y));
+}
+void main(){
+  float lg = uLog; float Wms = pow(10.0, lg);
+  vec2 p = (gl_FragCoord.xy - 0.5 * uRes) / uRes.x;
+  float cOff = mix(0.0, 6.0, smoothstep(2.4, 1.5, lg));
+  cOff = mix(cOff, 13.2, smoothstep(1.2, 0.7, lg));
+  float d = cOff + (p.x + uPuntero.x * 0.018) * Wms;      // ms relativos al click
+  float y = p.y + uPuntero.y * 0.012;
+  float t = T0 + d;
+  float aa = Wms / uRes.x;                                 // ms por píxel
+  float ay = 1.0 / uRes.x;                                 // unidades de pantalla por píxel
+  vec3 col = vec3(0.022, 0.02, 0.036);
+  float res = 0.0;
+
+  // L0 · un intento: la música como forma de onda, las marcas de obstáculos y el cabezal
+  float a0 = ventana(lg, 5.4, 3.5);
+  if (a0 > 0.001) {
+    float amp = 0.012 + 0.1 * pow(ruido1(t / 900.0), 1.6) * (0.6 + 0.4 * sin(t / 5200.0));
+    float barra = step(fract(t / 160.0), 0.6) * (1.0 - smoothstep(amp - ay, amp + ay, abs(y - 0.03)));
+    vec3 c0 = barra * (d < 0.0 ? uAcentoCol * 0.85 : uSilicio * 0.3);
+    float k = floor(t / BEAT);
+    c0 += step(0.35, hash11(k)) * vlin(t, k * BEAT + 120.0, 2.0, aa) * step(abs(y + 0.1), 0.012) * uSilicio * 0.7;
+    c0 += hlin(y, -0.15, 1.5, ay) * (d < 0.0 ? uAcentoCol : uSilicio * 0.25);
+    c0 += step(abs(y + 0.02), 0.2) * (vlin(d, 0.0, 2.0, aa) + exp(-abs(d) / (aa * 18.0)) * 0.25) * vec3(0.95, 0.9, 1.0);
+    col += c0 * a0;
+  }
+  // L1 · una sección: suelo, pinchos, el camino del cubo y el salto sin buffer que muere
+  float a1 = ventana(lg, 3.7, 2.0);
+  if (a1 > 0.001) {
+    vec3 c1 = hlin(y, SUELO, 1.5, ay) * uSilicio * 0.6;
+    float k = floor(t / BEAT); float kb = k * BEAT;
+    float esMain = step(abs(k - T0 / BEAT), 0.5);
+    float hay = max(step(0.35, hash11(k)), esMain);
+    c1 += rej(t, BEAT, 1.0, aa) * step(SUELO, y) * uSilicio * 0.1;
+    vec2 pA = pincho(t, y, kb + 120.0, 30.0, 0.06, ay) * hay;
+    vec2 pB = pincho(t, y, kb + 416.0, 12.0, 0.016, ay) * esMain;
+    c1 = mix(c1, vec3(0.05, 0.045, 0.08), max(pA.x, pB.x));
+    c1 += (pA.y + pB.y) * uSilicio * 0.9;
+    float yC = hay > 0.5 ? arco(t, kb + DEL) : -1.0;
+    if (yC < -0.9) yC = SUELO;
+    float raya = step(0.5, fract(d / (aa * 12.0)));
+    vec3 cFut = esMain > 0.5 ? uCian : uSilicio * 0.5 * raya;
+    c1 += trazo(y, yC, 2.0, ay) * (d < 0.0 ? uAcentoCol : cFut);
+    float yR = (esMain > 0.5 && d < 411.0) ? arco(d, 0.0) : -1.0;
+    c1 += trazo(y, yR, 1.5, ay) * raya * uSilicio * 0.55;
+    vec2 qx = vec2((d - 411.0) / Wms, y - (SUELO + ALTO * (411.0 / SALTO) * (9.0 / SALTO)));
+    c1 += esMain * (1.0 - smoothstep(ay, 2.5 * ay, abs(abs(qx.x) - abs(qx.y)))) * step(max(abs(qx.x), abs(qx.y)), 0.012) * vec3(0.95);
+    vec2 qc = vec2(d / Wms, y - (SUELO + 0.014));
+    float m = max(abs(qc.x), abs(qc.y));
+    float cubo = 1.0 - smoothstep(0.014 - ay, 0.014 + ay, m);
+    float marco = 1.0 - smoothstep(0.0, 1.5 * ay, abs(m - 0.007));
+    c1 = mix(c1, uAcentoCol * (1.0 - 0.65 * marco), cubo);
+    col += c1 * a1;
+  }
+  // L2 · un salto: la rejilla de ticks y el abanico de fantasmas (el +3 sobrevive)
+  float a2 = ventana(lg, 2.6, 1.2);
+  if (a2 > 0.001) {
+    vec3 c2 = rej(d, TICK, 1.0, aa) * uSilicio * 0.1 + rej(d, FRAME, 1.0, aa) * uSilicio * 0.22;
+    c2 += hlin(y, SUELO, 1.5, ay) * uSilicio * 0.5;
+    float fuerza = mix(0.3, 1.0, uMarcas);
+    for (int i = 0; i <= 8; i++) {
+      float yG = arco(d, float(i) * TICK);
+      vec3 cg = i < 3 ? uSilicio * 0.5 : (i == 3 ? uCian : uSilicio * 0.16);
+      c2 += trazo(y, yG, i == 3 ? 2.5 : 1.2, ay) * cg * fuerza;
     }
-    function initParticles() {
-      const count = Math.min(80, Math.floor(window.innerWidth / 18));
-      particles = Array.from({ length: count }, () => spawn(true));
+    c2 += vlin(d, 0.0, 1.5, aa) * step(SUELO, y) * step(y, 0.12) * vec3(0.8) * uMarcas;
+    col += c2 * a2;
+  }
+  // L3 · un frame: frames, ticks, el click real y la entrega 3 ticks después
+  float a3 = ventana(lg, 1.9, 0.0);
+  if (a3 > 0.001) {
+    vec3 c3 = rej(d, TICK, 1.0, aa) * uSilicio * 0.35 + rej(d, FRAME, 3.0, aa) * uSilicio * 0.7;
+    c3 += rej(d, TICK / 8.0, 1.0, aa) * uSilicio * 0.06 * smoothstep(1.2, 0.8, lg);
+    c3 += trazo(y, arco(d, 0.0), 1.5, ay) * uSilicio * 0.5;
+    float r3 = trazo(y, arco(d, DEL), 2.0, ay) * 0.9;
+    c3 += hlin(y, SUELO, 1.5, ay) * uSilicio * 0.6;
+    if (uMarcas > 0.0) {
+      vec2 qa = vec2(d / Wms, y - 0.05);
+      float anilloA = 1.0 - smoothstep(0.0, 2.0 * ay, abs(length(qa) - 0.012));
+      c3 += (anilloA + vlin(d, 0.0, 2.0, aa) * step(SUELO, y) * step(y, 0.038)) * vec3(0.95) * uMarcas;
+      vec2 qb = vec2((d - DEL) / Wms, y - 0.05);
+      float rb = 0.012 + 0.004 * sin(uTiempo * 4.0);
+      float anilloB = 1.0 - smoothstep(0.0, 2.5 * ay, abs(length(qb) - rb));
+      float puntoB = 1.0 - smoothstep(0.004, 0.004 + 2.0 * ay, length(qb));
+      r3 += (anilloB + puntoB + vlin(d, DEL, 2.0, aa) * step(SUELO, y) * step(y, 0.038)) * uMarcas;
+      float corchete = hlin(y, 0.05, 1.5, ay) * step(0.012 * Wms, d) * step(d, DEL - 0.012 * Wms);
+      float puntos = 0.0;
+      for (int i = 1; i <= 2; i++) puntos += 1.0 - smoothstep(0.003, 0.003 + 2.0 * ay, length(vec2((d - float(i) * TICK) / Wms, y - 0.05)));
+      c3 += (corchete + puntos) * uAcentoCol * 1.2 * uMarcas;
     }
-    function tick() {
-      ctx.clearRect(0, 0, w, h);
-      for (const p of particles) {
-        p.x += p.vx; p.y += p.vy; p.phase += p.speed;
-        if (p.y < -20) { Object.assign(p, spawn(false)); p.y = h + 20; }
-        if (p.x < -20) p.x = w + 20;
-        if (p.x > w + 20) p.x = -20;
-        ctx.globalAlpha = p.a * (0.6 + 0.4 * Math.sin(p.phase));
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.globalAlpha = 1;
-      requestAnimationFrame(tick);
-    }
-    window.addEventListener('resize', resize);
-    resize(); initParticles(); tick();
+    col += c3 * a3; res += r3 * a3;
+  }
+  // L4 · un tick: el salto sale aquí; una onda cian marca la entrega
+  float a4 = smoothstep(1.15, 0.75, lg);
+  if (a4 > 0.001) {
+    vec3 c4 = step(DEL, d) * step(d, DEL + TICK) * uCian * 0.05 + rej(d, TICK, 4.0, aa) * uSilicio * 0.6;
+    float fase = fract(uTiempo * 0.6);
+    float onda = (1.0 - smoothstep(0.0, 3.0 * ay, abs(length(vec2((d - DEL) / Wms, y - 0.05)) - fase * 0.3))) * (1.0 - fase);
+    col += c4 * a4; res += onda * a4 * uMarcas;
+  }
+  // pulsos de input (fondo de la demo y del pie)
+  if (uPulsos > 0.0) {
+    float fila = floor(y / 0.035); float fy = fract(y / 0.035) - 0.5;
+    float linea = 1.0 - smoothstep(0.02, 0.02 + ay / 0.035 * 2.0, abs(fy));
+    float fase = fract(d / (FRAME * 8.0) - uTiempo * 0.9 + hash11(fila) * 3.0);
+    float pul = smoothstep(0.86, 1.0, fase) * step(0.4, hash11(fila + 7.0));
+    float halo = pul * (1.0 - smoothstep(0.0, 0.45, abs(fy)));
+    col += (linea * 0.05 * uSilicio + (pul * linea * 1.6 + halo * 0.25) * uCian) * uPulsos;
+  }
+  col = mix(col, uAcentoCol * 0.22 + 0.02, uEntrada);
+  // inundación violeta: el frame del click se ve en blanco y negro bajo el color de la marca
+  float l = luma(col);
+  col = mix(col, uAcentoCol * (0.24 + 0.95 * l) + vec3(0.02), uFlood);
+  col += uCian * res;
+  float v = smoothstep(1.25, 0.35, length(p * vec2(1.0, uRes.x / uRes.y)));
+  col *= mix(0.72, 1.0, v);
+  col += (hash21(gl_FragCoord.xy + fract(uTiempo) * 17.0) - 0.5) * 0.035;
+  gl_FragColor = vec4(col, 1.0);
+}`;
+function crearZoom() {
+  const mat = new THREE.ShaderMaterial({
+    uniforms: { uRes: { value: new THREE.Vector2(W * DPR, H * DPR) }, uLog: { value: 4.78 }, uTiempo: uCubo.uTiempo, uPulsos: { value: 0 },
+      uFlood: { value: 0 }, uEntrada: { value: 0 }, uMarcas: { value: 1 }, uPuntero: { value: new THREE.Vector2() },
+      uCian: { value: colPlano(COL.cian) }, uAcentoCol: { value: colPlano(COL.acento) }, uSilicio: { value: colPlano(COL.silicio) } },
+    vertexShader: `void main(){ gl_Position = vec4(position.xy, 0.0, 1.0); }`, fragmentShader: ZOOM_FRAG, depthTest: false, depthWrite: false,
+  });
+  const esc = new THREE.Scene(); esc.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat));
+  return { esc, cam: new THREE.Camera(), mat, u: mat.uniforms, px: new Muelle(60, 14), py: new Muelle(60, 14) };
+}
 
-    /* ============ Brillo que sigue al cursor ============ */
-    const glow = document.querySelector('.cursor-glow');
-    if (glow && window.matchMedia('(hover: hover)').matches) {
-      let gx = innerWidth / 2, gy = innerHeight / 2, tx = gx, ty = gy;
-      window.addEventListener('mousemove', e => { tx = e.clientX; ty = e.clientY; });
-      (function follow() {
-        gx += (tx - gx) * 0.12; gy += (ty - gy) * 0.12;
-        glow.style.transform = `translate(${gx - 280}px, ${gy - 280}px)`;
-        requestAnimationFrame(follow);
-      })();
-    }
+// ===== Escena C · instalación: el .geode cae en geode/mods =====
+const BRILLO_FRAG = `
+uniform float uBrillo, uTiempo; uniform vec3 uAcentoCol, uCian; varying vec2 vUv;
+void main(){
+  vec2 d = vUv - vec2(0.275, 0.54); d.x *= 1.6;
+  float r = length(d);
+  float campo = smoothstep(0.8 * uBrillo + 0.04, 0.0, r) * uBrillo;
+  float a = abs(fract(r * 7.0 - uTiempo * 0.6) - 0.5);
+  float anillo = smoothstep(0.40, 0.5, a);
+  vec3 col = mix(vec3(0.0), uAcentoCol, smoothstep(0.0, 0.6, campo));
+  col = mix(col, vec3(0.96, 0.92, 1.0), smoothstep(0.6, 1.0, campo));
+  col += anillo * campo * uCian * 0.6;
+  gl_FragColor = vec4(col, campo * 0.85);
+}`;
+function texturaPanel() {
+  const S = 1024, Hh = 640, c = document.createElement("canvas"); c.width = S; c.height = Hh; const x = c.getContext("2d");
+  x.fillStyle = "#0d0b16"; x.fillRect(0, 0, S, Hh);
+  x.strokeStyle = "rgba(155,147,180,.10)"; x.lineWidth = 1;
+  for (let i = 0; i <= S; i += 32) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i, Hh); x.stroke(); }
+  for (let j = 0; j <= Hh; j += 32) { x.beginPath(); x.moveTo(0, j); x.lineTo(S, j); x.stroke(); }
+  const sx = 0.275 * S, sy = 0.46 * Hh, L2 = 125;                         // ranura en UV (0,275; 0,54)
+  x.fillStyle = "#050408"; x.fillRect(sx - L2, sy - L2, L2 * 2, L2 * 2);
+  x.strokeStyle = COL.acento; x.lineWidth = 3; x.strokeRect(sx - L2, sy - L2, L2 * 2, L2 * 2);
+  x.font = "500 18px ui-monospace, Menlo, monospace"; x.fillStyle = "rgba(245,243,255,.85)";
+  x.fillText("GEODE / MODS", sx - L2, sy - L2 - 14);
+  x.fillStyle = "rgba(155,147,180,.9)"; x.font = "500 16px ui-monospace, Menlo, monospace";
+  const lineas = ["sulawko.monster-input-buffer.geode", "geometry dash 2.2081 · windows", "geode >= 5.11.2", "240 hz · 1 tick = 0.25 f", "F6 · fuerza / strength", "K · panel de log"];
+  lineas.forEach((t, i) => x.fillText(t, 0.52 * S, 0.3 * Hh + i * 30));
+  x.strokeStyle = "rgba(245,243,255,.6)"; x.lineWidth = 2;
+  for (let i = 0; i <= 96; i++) { const px = 40 + i * ((S - 80) / 96); x.beginPath(); x.moveTo(px, Hh - 18); x.lineTo(px, Hh - (i % 4 ? 30 : 44)); x.stroke(); }   // regla de ticks en el borde frontal
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
+}
+function texturaEtiqueta() {
+  const S = 512, c = document.createElement("canvas"); c.width = c.height = S; const x = c.getContext("2d");
+  x.fillStyle = "#0d0b16"; x.fillRect(0, 0, S, S);
+  x.strokeStyle = COL.acento; x.lineWidth = 8; x.strokeRect(20, 20, S - 40, S - 40);
+  x.fillStyle = "#f5f3ff"; x.font = "300 168px Chivo, system-ui, sans-serif"; x.fillText("MIB", 52, 250);
+  x.fillStyle = COL.acento; x.font = "500 46px 'Chivo Mono', ui-monospace, monospace"; x.fillText(".geode", 58, 330);
+  x.fillStyle = "#9b93b4"; x.font = "500 30px 'Chivo Mono', ui-monospace, monospace"; x.fillText("v4.0.4 · SuLawko", 58, 390);
+  x.strokeStyle = "rgba(245,243,255,.7)"; x.lineWidth = 3;
+  for (let i = 0; i <= 24; i++) { const px = 58 + i * 16.5; x.beginPath(); x.moveTo(px, 450); x.lineTo(px, i % 4 ? 438 : 426); x.stroke(); }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
+}
+function texturaCepillado() {
+  const S = 512, c = document.createElement("canvas"); c.width = c.height = S; const x = c.getContext("2d");
+  let s = 7; const rnd = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+  x.fillStyle = "#8a8a8a"; x.fillRect(0, 0, S, S);
+  for (let i = 0; i < 2600; i++) { const v = 90 + rnd() * 90 | 0; x.strokeStyle = `rgb(${v},${v},${v})`; x.lineWidth = 0.6 + rnd() * 1.2; const y = rnd() * S; x.beginPath(); x.moveTo(0, y); x.lineTo(S, y + (rnd() - 0.5) * 1.5); x.stroke(); }
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(3, 3); return t;
+}
+function crearInstalar() {
+  const esc = new THREE.Scene(); esc.environment = entorno(); esc.environmentIntensity = 0.55;
+  const cam = new THREE.PerspectiveCamera(34, W / H, 0.05, 80);
+  const o = { esc, cam, grupo: new THREE.Group(), paquete: null, leds: null, brillo: null, sombra: null, sx: new Muelle(120, 20), sy: new Muelle(120, 20) };
+  esc.add(o.grupo);
+  // foco con el único mapa de sombras de la pieza; la luz no se mueve, el paquete sí
+  const luz = new THREE.SpotLight(0xf3eaff, 80, 40, 0.55, 0.6, 1.3); luz.position.set(-3, 6.5, 2.5); luz.target.position.set(-0.9, 0.3, -0.1); esc.add(luz, luz.target);
+  luz.castShadow = true; luz.shadow.mapSize.set(movil() ? 1024 : 2048, movil() ? 1024 : 2048); luz.shadow.bias = -0.0004; luz.shadow.normalBias = 0.02;
+  luz.shadow.camera.near = 2; luz.shadow.camera.far = 16; luz.shadow.radius = 4;
+  const luz2 = new THREE.PointLight(COL.cian, 8, 12, 1.6); luz2.position.set(0, 1.2, 3.2);
+  const luz3 = new THREE.PointLight(COL.acento, 10, 14, 1.6); luz3.position.set(2.5, 1.5, -1.5);
+  esc.add(luz2, luz3, new THREE.AmbientLight(0x2a2440, 0.6), new THREE.HemisphereLight(0xb9a3e8, 0x0a0714, 0.6));
+  const suelo = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.ShadowMaterial({ opacity: 0.55 }));
+  suelo.rotation.x = -Math.PI / 2; suelo.position.y = -0.002; suelo.receiveShadow = true; esc.add(suelo);
+  const base = new THREE.Mesh(new RoundedBoxGeometry(4.4, 0.32, 2.9, 4, 0.05),
+    new THREE.MeshPhysicalMaterial({ color: 0x3b3748, metalness: 0.85, roughness: 0.42, roughnessMap: texturaCepillado(), envMapIntensity: 1.1 }));
+  base.position.y = 0.16; base.castShadow = base.receiveShadow = true; o.grupo.add(base);
+  const panel = new THREE.Mesh(new THREE.PlaneGeometry(4.0, 2.5), new THREE.MeshPhysicalMaterial({ map: texturaPanel(), roughness: 0.5, metalness: 0.15, clearcoat: 0.4, clearcoatRoughness: 0.3 }));
+  panel.rotation.x = -Math.PI / 2; panel.position.y = 0.3215; panel.receiveShadow = true; o.grupo.add(panel);
+  const marcoMat = new THREE.MeshPhysicalMaterial({ color: COL.acento, metalness: 0.7, roughness: 0.3, emissive: new THREE.Color(COL.acento), emissiveIntensity: 0.15 });
+  for (const [w, dd, x, z] of [[1.04, 0.03, 0, -0.505], [1.04, 0.03, 0, 0.505], [0.03, 1.04, -0.505, 0], [0.03, 1.04, 0.505, 0]]) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, 0.025, dd), marcoMat); m.position.set(-0.9 + x, 0.334, -0.1 + z); m.castShadow = true; o.grupo.add(m);
+  }
+  // el paquete .geode
+  const paq = new THREE.Group();
+  const caja = new THREE.Mesh(new RoundedBoxGeometry(0.86, 0.16, 0.86, 4, 0.035), new THREE.MeshPhysicalMaterial({
+    color: 0x7c4fe0, metalness: 0.6, roughness: 0.2, iridescence: 1, iridescenceIOR: 1.35, iridescenceThicknessRange: [250, 800], clearcoat: 1, clearcoatRoughness: 0.05, envMapIntensity: 1.3 }));
+  caja.castShadow = caja.receiveShadow = true; paq.add(caja);
+  const et = texturaEtiqueta();
+  const tapa = new THREE.Mesh(new THREE.PlaneGeometry(0.74, 0.74), new THREE.MeshStandardMaterial({ map: et, emissiveMap: et, emissive: 0xffffff, emissiveIntensity: 0.55, roughness: 0.4, metalness: 0.1 }));
+  tapa.rotation.x = -Math.PI / 2; tapa.position.y = 0.0815; paq.add(tapa);
+  o.paquete = paq; o.grupo.add(paq);
+  // 24 LED en el canto frontal que se encienden en ola
+  const led = new THREE.InstancedMesh(new THREE.BoxGeometry(0.05, 0.03, 0.02), new THREE.MeshBasicMaterial({ color: 0xffffff }), 24);
+  const mtx = new THREE.Matrix4();
+  for (let i = 0; i < 24; i++) { mtx.setPosition(-1.55 + i * 0.135, 0.2, 1.452); led.setMatrixAt(i, mtx); led.setColorAt(i, new THREE.Color(0x0a0714)); }
+  led.instanceColor.needsUpdate = true; o.leds = led; o.grupo.add(led);
+  // brillo que se extiende por el panel desde la ranura
+  const brillo = new THREE.Mesh(new THREE.PlaneGeometry(4.0, 2.5), new THREE.ShaderMaterial({
+    uniforms: { uBrillo: { value: 0 }, uTiempo: uCubo.uTiempo, uAcentoCol: { value: colPlano(COL.acento) }, uCian: { value: colPlano(COL.cian) } },
+    vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader: BRILLO_FRAG, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+  brillo.rotation.x = -Math.PI / 2; brillo.position.y = 0.327; o.brillo = brillo; o.grupo.add(brillo);
+  // sombra de contacto: disco radial que se concentra al encajar
+  const sc = document.createElement("canvas"); sc.width = sc.height = 128; const sx = sc.getContext("2d");
+  const gr = sx.createRadialGradient(64, 64, 8, 64, 64, 64); gr.addColorStop(0, "rgba(0,0,0,.9)"); gr.addColorStop(0.55, "rgba(0,0,0,.35)"); gr.addColorStop(1, "rgba(0,0,0,0)");
+  sx.fillStyle = gr; sx.fillRect(0, 0, 128, 128);
+  const sombra = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 1.3), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(sc), transparent: true, depthWrite: false, opacity: 0 }));
+  sombra.rotation.x = -Math.PI / 2; sombra.position.set(-0.9, 0.3225, -0.1); o.sombra = sombra; o.grupo.add(sombra);
+  return o;
+}
 
-    /* ============ Navbar al hacer scroll ============ */
-    const nav = document.querySelector('.nav');
-    const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 30);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
+// ---------- Carga por prioridades: el hero primero, el resto cuando el hilo está libre ----------
+if (hayGL) {
+  ESC.cubo = crearCubo();
+  const idle = window.requestIdleCallback ? (f) => requestIdleCallback(f, { timeout: 1200 }) : (f) => setTimeout(f, 800);
+  idle(() => { ESC.zoom = crearZoom(); });
+  idle(() => { ESC.inst = crearInstalar(); });
+}
 
-    /* ============ Menú móvil ============ */
-    const burger = document.querySelector('.nav-toggle');
-    const links = document.querySelector('.nav-links');
-    const setMenu = (open) => {
-      burger.classList.toggle('open', open);
-      links.classList.toggle('open', open);
-      burger.setAttribute('aria-expanded', String(open));
-    };
-    burger.addEventListener('click', () => setMenu(!links.classList.contains('open')));
-    links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setMenu(false)));
-    window.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
+// ---------- Progresos de scroll ----------
+const PR = { hero: 0, zoom: 0, demo: 0, inst: 0, pie: 0, heroVisible: true, zoomVisible: false, demoVisible: false, instVisible: false, pieVisible: false };
+ScrollTrigger.create({ trigger: "#hero", start: "top top", end: "bottom top", scrub: true, onUpdate: (s) => { PR.hero = s.progress; }, onToggle: (s) => { cursorEl.classList.toggle("visible", s.isActive && introHecha); } });
+ScrollTrigger.create({ trigger: "#zoom", start: "top top", end: "bottom bottom", scrub: true, onUpdate: (s) => { PR.zoom = s.progress; } });
+ScrollTrigger.create({ trigger: "#demo", start: "top bottom", end: "bottom top", scrub: true, onUpdate: (s) => { PR.demo = s.progress; } });
+ScrollTrigger.create({ trigger: "#instalar", start: "top top", end: "bottom bottom", scrub: true, onUpdate: (s) => { PR.inst = s.progress; } });
+ScrollTrigger.create({ trigger: "footer", start: "top bottom", end: "bottom bottom", scrub: true, onUpdate: (s) => { PR.pie = s.progress; } });
+const SEC = { hero: $("#hero"), zoom: $("#zoom"), demo: $("#demo"), inst: $("#instalar"), pie: $("footer") };
+const visible = (el) => { const r = el.getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; };
+function medirVisibles() { PR.heroVisible = visible(SEC.hero); PR.zoomVisible = visible(SEC.zoom); PR.instVisible = visible(SEC.inst); PR.pieVisible = visible(SEC.pie); }
 
-    /* ============ Reveal al hacer scroll ============ */
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
-      });
-    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
-    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+ScrollTrigger.create({ trigger: "#instalar", start: "top 60%", once: true, onEnter: () => { instEntro = true; entradaLetras(letrasS1, 0); entradaLetras(letrasS2, 0.3); } });
 
-    /* ============ Contadores animados ============ */
-    // El HTML ya trae el valor final; solo se anima si el navegador lo permite.
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const cio = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (!e.isIntersecting) return;
-        const el = e.target;
-        const target = parseFloat(el.dataset.target);
-        if (reduceMotion || !target) { cio.unobserve(el); return; }
-        const suffix = el.dataset.suffix || '';
-        const decimals = el.dataset.decimals ? parseInt(el.dataset.decimals, 10) : 0;
-        const dur = 1500, start = performance.now();
-        (function step(now) {
-          const p = Math.min((now - start) / dur, 1);
-          const eased = 1 - Math.pow(1 - p, 3);
-          el.textContent = (target * eased).toFixed(decimals) + suffix;
-          if (p < 1) requestAnimationFrame(step);
-        })(start);
-        cio.unobserve(el);
-      });
-    }, { threshold: 0.4 });
-    document.querySelectorAll('[data-target]').forEach(el => cio.observe(el));
+// ---------- Cifras: solo datos verdaderos (las descargas salen de los Releases de GitHub) ----------
+const descargas = fetch(`https://api.github.com/repos/${CONFIG.REPO}/releases`)
+  .then((r) => (r.ok ? r.json() : []))
+  .then((rels) => (Array.isArray(rels) ? rels : []).reduce((s, r) => s + (r.assets || []).reduce((a, x) => a + (x.download_count || 0), 0), 0))
+  .catch(() => 0);
+let totalDescargas = null, cifrasVistas = false;
+descargas.then((n) => { totalDescargas = n; etiquetaDescargas(); if (cifrasVistas) contar($("#dl-n"), n, "int"); });
+function etiquetaDescargas() {
+  $("#dl-lbl").textContent = totalDescargas === 0 ? L().niveles : L().descargas;
+  if (totalDescargas === 0) $("#dl-n").textContent = "∞";
+}
+const pintaCifra = (s, v, f) => { s.textContent = f === "ver" ? v.toFixed(3) : fmt(v, 0); };
+function contar(s, n, f) { if (!n && f !== "ver") { pintaCifra(s, n, f); return; } const o = { v: 0 }; gsap.to(o, { v: n, duration: reducido ? 0 : 1.8, ease: "power3.out", onUpdate: () => pintaCifra(s, o.v, f) }); }
+// reglas de ticks bajo cada cifra: se trazan al llegar
+for (const svg of $$(".cifra .mini")) {
+  const pts = []; for (let i = 0; i <= 24; i++) { const x = i * 6.25; pts.push(`${x},33`, `${x},${i % 4 ? 26 : 14}`, `${x},33`); }
+  svg.innerHTML = `<line x1="0" y1="33" x2="150" y2="33"/><polyline points="${pts.join(" ")}"/><circle cx="150" cy="14" r="2.5"/>`;
+}
+let fuerzasVistas = false;
+ScrollTrigger.create({ trigger: "#metricas", start: "top 65%", once: true, onEnter: () => {
+  cifrasVistas = true;
+  for (const s of $$("[data-n]")) contar(s, +s.dataset.n, s.dataset.f);
+  if (totalDescargas) contar($("#dl-n"), totalDescargas, "int");
+  fuerzasVistas = true;
+  for (const b of $$("#fuerzas-svg .b")) gsap.to(b, { attr: { width: +b.dataset.w }, duration: reducido ? 0 : 1.4, ease: "power3.inOut", delay: 0.2 });
+  for (const p of $$(".cifra .mini polyline")) { const L = p.getTotalLength(); gsap.fromTo(p, { strokeDasharray: L, strokeDashoffset: L }, { strokeDashoffset: 0, duration: reducido ? 0 : 1.6, ease: "power2.inOut", delay: 0.3 }); }
+  gsap.fromTo(".cifra .mini circle", { opacity: 0 }, { opacity: 1, duration: 0.3, delay: reducido ? 0 : 1.8 });
+} });
+function cifrasFinales() {
+  if (cifrasVistas) { for (const s of $$("[data-n]")) pintaCifra(s, +s.dataset.n, s.dataset.f); if (totalDescargas) pintaCifra($("#dl-n"), totalDescargas, "int"); }
+  if (totalDescargas !== null) etiquetaDescargas(); else $("#dl-lbl").textContent = L().descargas;
+}
 
-    /* ============ Barras del visual (ecualizador) ============ */
-    const barsEl = document.getElementById('bars');
-    for (let i = 0; i < 32; i++) {
-      const b = document.createElement('span');
-      b.className = 'bar';
-      b.style.height = (22 + Math.abs(Math.sin(i * 0.35)) * 72) + '%';
-      b.style.animationDelay = (i * 0.055) + 's';
-      b.style.animationDuration = (1.2 + Math.random() * 0.7) + 's';
-      barsEl.appendChild(b);
-    }
+// ---------- Fuerzas de F6 (datos del mod: retraso máximo en ticks) ----------
+const FUERZAS = [2, 4, 8, 16, 24, 32, 0];
+const etiquetaFuerza = (t) => t === 0 ? L().apagado : `${fmt(t / 4, t % 4 ? 1 : 0)}f`;
+function dibujarFuerzas() {
+  const svg = $("#fuerzas-svg"); svg.setAttribute("aria-label", L().graf);
+  svg.innerHTML = `<g class="mono">${FUERZAS.filter(Boolean).map((t, i) => { const y = i * 44, w = t / 32 * 360;
+    return `<text x="0" y="${y + 18}">${etiquetaFuerza(t)} · ${t} ${L().ticks}</text><rect class="b" x="200" y="${y + 4}" width="${fuerzasVistas ? w : 0}" height="20" fill="${t === DEMO.fuerza ? COL.acento : "#3b3550"}" data-w="${w}"/><text class="val" x="640" y="${y + 18}" text-anchor="end">${fmt(t * TICK, 1)} ms</text>`; }).join("")}
+    <line x1="200" y1="0" x2="200" y2="262" stroke="rgba(245,243,255,.2)"/></g>`;
+}
 
-    /* ============ Tilt 3D en las tarjetas ============ */
-    document.querySelectorAll('.tilt').forEach(card => {
-      card.addEventListener('mousemove', e => {
-        const r = card.getBoundingClientRect();
-        const x = (e.clientX - r.left) / r.width - 0.5;
-        const y = (e.clientY - r.top) / r.height - 0.5;
-        card.style.transform = `translateY(-8px) rotateX(${(-y * 5).toFixed(2)}deg) rotateY(${(x * 5).toFixed(2)}deg)`;
-      });
-      card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+// ---------- Secciones DOM ----------
+for (const p of $$(".diagrama .dib")) { const L = p.getTotalLength ? p.getTotalLength() : 600; p.style.strokeDasharray = L; p.style.strokeDashoffset = L; }
+gsap.set(".diagrama .crudo", { opacity: 0 });
+ScrollTrigger.create({ trigger: "#faq", start: "top 70%", once: true, onEnter: () => {
+  gsap.to(".diagrama .dib", { strokeDashoffset: 0, duration: reducido ? 0 : 1.8, ease: "power2.inOut", stagger: 0.08 });
+  gsap.to(".diagrama .crudo", { opacity: 1, duration: reducido ? 0 : 0.8, delay: reducido ? 0 : 0.9 });
+  gsap.from(".preguntas details", { opacity: 0, y: 18, duration: reducido ? 0 : 0.7, stagger: 0.08, ease: "power3.out" });
+} });
+for (const h of $$("h2.sec")) ScrollTrigger.create({ trigger: h, start: "top 85%", once: true, onEnter: () => gsap.from(h, { opacity: 0, y: 30, filter: "blur(8px)", duration: reducido ? 0 : 0.9, ease: "power3.out" }) });
+const navLinks = $$(".nav ul a");
+for (const a of navLinks) {
+  a.dataset.t = a.textContent;
+  if (!reducido) a.addEventListener("pointerenter", () => gsap.to(a, { duration: 0.55, scrambleText: { text: a.dataset.t, chars: "upperCase", speed: 1.1 }, overwrite: true }));
+}
+const fijarAnchos = () => { for (const a of navLinks) { a.style.removeProperty("--w"); } for (const a of navLinks) a.style.setProperty("--w", `${a.offsetWidth}px`); };
+(document.fonts?.ready || Promise.resolve()).then(fijarAnchos);
+const SEC_DOM = $$("#demo, #metricas, #faq, #descarga"), secClara = $("#faq");
+function navEstado() {
+  const r = secClara.getBoundingClientRect();
+  document.body.classList.toggle("claro-on", r.top < 40 && r.bottom > 40);
+  document.body.classList.toggle("nav-solida", SEC_DOM.some((s) => { const q = s.getBoundingClientRect(); return q.top < 72 && q.bottom > 0; }));
+}
+$("#sha").textContent = CONFIG.SHA256;
+$("#dl-btn").href = CONFIG.DOWNLOAD_URL;
+$("#copiar").addEventListener("click", async () => {
+  const b = $("#copiar");
+  try { await navigator.clipboard.writeText(CONFIG.SHA256); b.textContent = L().copiado; } catch (_) { b.textContent = "Ctrl+C"; }
+  setTimeout(() => { b.textContent = tx("p_copiar"); }, 1800);
+});
+
+// ---------- Escala del zoom: etiquetas, barra y aumento ----------
+const ETAPAS = [
+  { lg: 4.78, n: { en: "60", es: "60" }, u: "s" },
+  { lg: 3.3, n: { en: "2", es: "2" }, u: "s" },
+  { lg: 2.3, n: { en: "200", es: "200" }, u: "ms" },
+  { lg: 1.22, n: { en: "16.7", es: "16,7" }, u: "ms" },
+  { lg: 0.62, n: { en: "4.17", es: "4,17" }, u: "ms" },
+];
+const LG1 = 0.62;
+// Tramos del zoom (progreso → log10 del ancho de pantalla en ms): intento 0→0,18 · sección 0,18→0,38 · salto 0,38→0,58 ·
+// frame (violeta) 0,58→0,86 · tick 0,86→1
+const TRAMOS = [[0, 4.78], [0.18, 3.3], [0.38, 2.3], [0.58, 1.5], [0.72, 1.22], [0.86, 0.85], [1, 0.62]];
+function logDeProgreso(q) {
+  for (let i = 1; i < TRAMOS.length; i++) if (q <= TRAMOS[i][0]) { const [q0, l0] = TRAMOS[i - 1], [q1, l1] = TRAMOS[i]; return lerp(l0, l1, (q - q0) / (q1 - q0)); }
+  return LG1;
+}
+let etapaAct = -1;
+function barraEscala(Wms) {
+  const bw = $(".barra-escala").offsetWidth / innerWidth; let v = Wms * bw, u = "ms";
+  if (v >= 1000) { v /= 1000; u = "s"; }
+  const p = Math.pow(10, Math.floor(Math.log10(v))); const r = Math.round(v / p * 2) / 2 * p;
+  return `${fmt(r, r < 10 ? 1 : 0)} ${u}`;
+}
+const zoomNum = $("#zoom-num"), zoomUni = $("#zoom-uni"), zoomTxt = $("#zoom-txt"), barraV = $("#barra-v"), zoomAum = $("#zoom-aum"), etapasEl = $$(".zoom-etapas span");
+function etiquetasEtapas() { etapasEl.forEach((s, i) => { s.textContent = L().etapas[i]; }); }
+function pintarEtapa(e, animar) {
+  const E = ETAPAS[e], n = E.n[idioma], frase = L().frases[e];
+  etapasEl.forEach((s, i) => s.classList.toggle("on", i === e));
+  if (!animar || reducido) { zoomNum.textContent = n; zoomUni.textContent = E.u; zoomTxt.textContent = frase; return; }
+  gsap.to(zoomNum, { duration: 0.6, scrambleText: { text: n, chars: "0123456789", speed: 0.8 }, overwrite: true });
+  gsap.to(zoomUni, { duration: 0.5, scrambleText: { text: E.u, chars: "ms", speed: 0.6 }, overwrite: true });
+  gsap.to(zoomTxt, { duration: 0.9, scrambleText: { text: frase, chars: "lowerCase", speed: 1.2, revealDelay: 0.1 }, overwrite: true });
+}
+function actualizarZoomHUD(lg) {
+  const Wms = Math.pow(10, lg);
+  barraV.textContent = barraEscala(Wms);
+  const aum = 60000 / Wms; const ex = Math.floor(Math.log10(aum)); const mant = aum / Math.pow(10, ex);
+  zoomAum.textContent = aum < 10 ? `×${fmt(aum, 1)}` : `×${fmt(mant, 1)}·10${String(ex).replace(/\d/g, (d) => "⁰¹²³⁴⁵⁶⁷⁸⁹"[d])}`;
+  let e = 0; for (let i = 0; i < ETAPAS.length; i++) if (lg <= ETAPAS[i].lg + 0.45) e = i;
+  if (e !== etapaAct) { etapaAct = e; pintarEtapa(e, true); }
+  const flood = (lg < 1.9 && lg > 0.95) ? Math.min(clamp((1.9 - lg) / 0.3, 0, 1), clamp((lg - 0.95) / 0.3, 0, 1)) : 0;
+  document.body.classList.toggle("flood-on", flood > 0.5);
+  return flood;
+}
+// Estados estáticos (movimiento reducido / sin WebGL)
+const CUADROS = [
+  "repeating-linear-gradient(90deg,#a855f7 0 3px,transparent 3px 9px) center/100% 34% no-repeat,#0c0b14",
+  "linear-gradient(180deg,transparent 68%,#9b93b4 68% 68.6%,transparent 68.6%),linear-gradient(35deg,transparent 48%,#3be8ff 48% 49%,transparent 49%),#0c0b14",
+  "repeating-linear-gradient(90deg,rgba(155,147,180,.3) 0 1px,transparent 1px 18px),linear-gradient(28deg,transparent 50%,#3be8ff 50% 50.8%,transparent 50.8%),#0c0b14",
+  "repeating-linear-gradient(90deg,#0a0714 0 3px,transparent 3px 64px),#a855f7",
+  "radial-gradient(circle at 35% 55%,transparent 0 20%,#3be8ff 20.5% 21.8%,transparent 22.3%),repeating-linear-gradient(90deg,rgba(155,147,180,.55) 0 3px,transparent 3px 100%),#0c0b14",
+];
+function generarEstados() {
+  $("#estados").innerHTML = ETAPAS.map((E, i) => `<div class="estado"><div><h3>${E.n[idioma]} <small style="font-size:.4em">${E.u}</small></h3><p class="lead">${L().frases[i]}</p></div>
+  <div class="cuadro" style="background:${CUADROS[i]}"></div></div>`).join("");
+}
+
+// ---------- Demo: prueba de timing con el buffer (simulada, a 240 ticks/s) ----------
+const TOL_TEMPRANO = 25, TOL_TARDE = 45;      // ventana base ilustrativa en ms; el buffer amplía el lado temprano
+const DEMO = { periodo: 1600, base: performance.now() + 1500, pulsado: -1, revisado: -1, salvados: 0, fuerza: 8, salto: -1e9, fallo: -1e9, brillo: 0, etiqueta: "", tEtiqueta: -1e9 };
+const pista = $("#pista"), pctx = pista.getContext("2d"), logEl = $("#log");
+function tamPista() { const r = pista.getBoundingClientRect(); const dp = Math.min(devicePixelRatio || 1, 2); pista.width = Math.max(1, Math.round(r.width * dp)); pista.height = Math.max(1, Math.round(r.height * dp)); pctx.setTransform(dp, 0, 0, dp, 0, 0); }
+function botonesFuerza() {
+  $("#fuerzas").innerHTML = FUERZAS.map((t) => `<button type="button" data-t="${t}" aria-pressed="${t === DEMO.fuerza}">${etiquetaFuerza(t)}</button>`).join("");
+}
+$("#fuerzas").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  DEMO.fuerza = +b.dataset.t; for (const x of $$("#fuerzas button")) x.setAttribute("aria-pressed", String(x === b));
+  statsDemo(); dibujarFuerzas();
+});
+function statsDemo() { $("#d-ven").textContent = `${fmt(DEMO.fuerza * TICK, 1)} ms`; $("#d-salv").textContent = fmt(DEMO.salvados); }
+function linea(texto, clase, espera = false) {
+  if (logEl.dataset.vacio && !espera) { logEl.innerHTML = ""; delete logEl.dataset.vacio; }   // el primer click borra el «esperando…»
+  const d = document.createElement("div"); d.className = clase; d.textContent = texto; logEl.prepend(d);
+  while (logEl.children.length > 7) logEl.lastChild.remove();
+}
+function pulsar() {
+  const now = performance.now();
+  const k = Math.round((now - DEMO.base) / DEMO.periodo);
+  if (k < 0 || k <= DEMO.pulsado) return;      // un click por pincho
+  DEMO.pulsado = k;
+  const off = now - (DEMO.base + k * DEMO.periodo);
+  let clase = "mal", texto, d = -1;
+  if (off >= -TOL_TEMPRANO && off <= TOL_TARDE) { clase = "ok"; texto = L().ok; d = 0; }
+  else if (off < -TOL_TEMPRANO) {
+    const n = Math.ceil((-TOL_TEMPRANO - off) / TICK);
+    if (DEMO.fuerza > 0 && n <= DEMO.fuerza) { clase = "salvado"; d = n; texto = `SAVED press +${n}t (${fmt(n * 0.25, 2)}f)`; DEMO.salvados++; DEMO.etiqueta = `+${n}t`; DEMO.tEtiqueta = now; }
+    else texto = L().temprano + (DEMO.fuerza === 0 ? ` · ${L().sinBuffer}` : "");
+  } else texto = L().tarde;
+  if (d >= 0) DEMO.salto = now + d * TICK; else DEMO.fallo = now;
+  DEMO.brillo = 1;
+  linea(`${texto} · ${firmado(off)} ms`, clase);
+  $("#d-off").textContent = `${firmado(off)} ms`; statsDemo();
+}
+function pasoDemo(now, dt) {
+  DEMO.brillo = Math.max(0, DEMO.brillo - dt * 1.4);
+  const k = Math.floor((now - DEMO.base - TOL_TARDE) / DEMO.periodo);   // pincho que ya pasó: si nadie tocó, el cubo choca
+  if (k >= 0 && k > DEMO.revisado) { DEMO.revisado = k; if (DEMO.pulsado < k) DEMO.fallo = now; }
+}
+function dibujarPista(now) {
+  const w = pista.clientWidth, h = pista.clientHeight; if (!w) return;
+  if (pista.width < 2) tamPista();
+  const x = pctx; x.clearRect(0, 0, w, h);
+  const suelo = h - 34, obj = w * 0.24, v = (w * 0.74) / 1100;           // px por ms
+  // ventana base (cian) y extensión del buffer hacia el lado temprano (violeta)
+  x.fillStyle = rgba(COL.cian, 0.14); x.fillRect(obj - TOL_TARDE * v, suelo - 46, (TOL_TARDE + TOL_TEMPRANO) * v, 46);
+  if (DEMO.fuerza) { x.fillStyle = rgba(COL.acento, 0.24); x.fillRect(obj + TOL_TEMPRANO * v, suelo - 46, DEMO.fuerza * TICK * v, 46); }
+  // regla de frames y ticks
+  x.strokeStyle = rgba(COL.silicio, 0.45); x.lineWidth = 1; x.beginPath();
+  for (let i = -Math.ceil(obj / (TICK * v)); i * TICK * v + obj < w; i++) { const px = Math.round(obj + i * TICK * v) + 0.5; const alto = i % 16 === 0 ? 12 : i % 4 === 0 ? 7 : 3; x.moveTo(px, h - 6); x.lineTo(px, h - 6 - alto); }
+  x.stroke();
+  x.strokeStyle = rgba(COL.silicio, 0.7); x.beginPath(); x.moveTo(0, suelo + 0.5); x.lineTo(w, suelo + 0.5); x.stroke();
+  x.setLineDash([3, 4]); x.strokeStyle = rgba("#f5f3ff", 0.6); x.beginPath(); x.moveTo(obj + 0.5, 8); x.lineTo(obj + 0.5, suelo); x.stroke(); x.setLineDash([]);
+  // pinchos que se acercan
+  const kN = Math.floor((now - DEMO.base) / DEMO.periodo);
+  for (let k = kN - 1; k <= kN + 2; k++) {
+    if (k < 0) continue;
+    const xs = obj + (DEMO.base + k * DEMO.periodo - now) * v; if (xs < -20 || xs > w + 20) continue;
+    x.fillStyle = "#0c0b14"; x.strokeStyle = rgba("#f5f3ff", 0.85); x.lineWidth = 1.2;
+    x.beginPath(); x.moveTo(xs - 11, suelo); x.lineTo(xs, suelo - 24); x.lineTo(xs + 11, suelo); x.closePath(); x.fill(); x.stroke();
+  }
+  // el cubo: salta si el click fue válido (o salvado), tiembla si no
+  let cy = 0; const u = (now - DEMO.salto) / 420;
+  if (u >= 0 && u <= 1) cy = -76 * 4 * u * (1 - u);
+  const fallo = now - DEMO.fallo < 380, sac = fallo ? Math.sin(now / 18) * 2 : 0;
+  x.fillStyle = fallo ? COL.silicio : COL.acento; x.fillRect(obj - 34 + sac, suelo - 22 + cy, 22, 22);
+  x.strokeStyle = "#0a0714"; x.lineWidth = 2; x.strokeRect(obj - 28 + sac, suelo - 16 + cy, 10, 10);
+  if (now - DEMO.tEtiqueta < 700) { x.fillStyle = COL.acento; x.font = "500 11px 'Chivo Mono', ui-monospace, monospace"; x.fillText(`SAVED ${DEMO.etiqueta}`, obj - 34, suelo - 34 + cy); }
+}
+$("#saltar").addEventListener("pointerdown", (e) => { e.preventDefault(); pulsar(); });
+$("#saltar").addEventListener("click", (e) => { if (e.detail === 0) pulsar(); });   // activación por teclado
+pista.addEventListener("pointerdown", () => pulsar());
+addEventListener("keydown", (e) => {
+  if ((e.code === "Space" || e.key === " ") && PR.demoVisible && !/^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(document.activeElement?.tagName || "")) { e.preventDefault(); pulsar(); }
+});
+
+// ---------- Táctil: arrastre gira el cubo; giroscopio si lo hay; si no, vaivén automático ----------
+const TOQUE = { arrastra: false, x0: 0, y0: 0, dx: 0, dy: 0, giro: false };
+if (tactil) {
+  const hero = $("#hero");
+  hero.addEventListener("touchstart", (e) => { TOQUE.arrastra = true; TOQUE.x0 = e.touches[0].clientX - TOQUE.dx * 200; TOQUE.y0 = e.touches[0].clientY - TOQUE.dy * 200; }, { passive: true });
+  hero.addEventListener("touchmove", (e) => { if (!TOQUE.arrastra) return; TOQUE.dx = clamp((e.touches[0].clientX - TOQUE.x0) / 200, -1, 1); TOQUE.dy = clamp((e.touches[0].clientY - TOQUE.y0) / 200, -1, 1); P.ultimo = performance.now(); }, { passive: true });
+  hero.addEventListener("touchend", () => { TOQUE.arrastra = false; });
+  addEventListener("deviceorientation", (e) => { if (e.gamma == null) return; TOQUE.giro = true; TOQUE.dx = clamp(e.gamma / 30, -1, 1); TOQUE.dy = clamp((e.beta - 40) / 30, -1, 1); P.ultimo = performance.now(); }, { passive: true });
+}
+
+// ---------- Idioma ----------
+function aplicarIdioma(l) {
+  idioma = l; document.documentElement.lang = l;
+  for (const el of nodosI18n) { if (el.dataset.i18n) el.textContent = tx(el.dataset.i18n); if (el.dataset.i18nHtml) el.innerHTML = tx(el.dataset.i18nHtml); }
+  document.title = L().titulo;
+  $("#lang").textContent = L().lang; $("#lang").setAttribute("aria-label", L().langAria);
+  cursorEl.dataset.t = L().cursor;
+  partirInstalar();
+  for (const a of navLinks) a.dataset.t = a.textContent;
+  requestAnimationFrame(fijarAnchos);
+  etiquetasEtapas(); generarEstados();
+  pintarEtapa(Math.max(0, etapaAct), false);
+  botonesFuerza(); dibujarFuerzas(); statsDemo(); cifrasFinales();
+  if (!logEl.children.length || logEl.dataset.vacio) { logEl.innerHTML = ""; linea(L().espera, "mal", true); logEl.dataset.vacio = "1"; }
+}
+$("#lang").addEventListener("click", () => { const n = idioma === "es" ? "en" : "es"; aplicarIdioma(n); try { localStorage.setItem("mib-lang-choice", n); } catch (_) {} });
+let idiomaInicial = "en";
+try { idiomaInicial = localStorage.getItem("mib-lang-choice") || "en"; } catch (_) {}
+aplicarIdioma(idiomaInicial === "es" ? "es" : "en");
+
+// ---------- Bucle de dibujo (una escena por fotograma; se para con la pestaña oculta) ----------
+function tam() {
+  W = innerWidth; H = innerHeight;
+  tamPista();
+  if (!hayGL) return;
+  renderer.setSize(W, H, false);
+  for (const o of [ESC.cubo, ESC.inst]) if (o) { o.cam.aspect = W / H; o.cam.updateProjectionMatrix(); }
+  if (ESC.zoom) ESC.zoom.u.uRes.value.set(W * DPR, H * DPR);
+}
+addEventListener("resize", () => { tam(); ScrollTrigger.refresh(); });
+tam();
+
+let ultimoT = performance.now();
+const hudTilt = $("#hud-tilt"), pasosEl = [$("#paso-1"), $("#paso-2"), $("#paso-3")];
+const tmp = new THREE.Vector3(), colLed = new THREE.Color(), colCian = new THREE.Color(COL.cian);
+function fotograma(now) {
+  const dt = Math.min((now - ultimoT) / 1000, 1 / 30); ultimoT = now; ESC.t += dt;
+  uCubo.uTiempo.value = ESC.t;
+  PR.demoVisible = visible(SEC.demo);
+  if (PR.demoVisible) { pasoDemo(now, dt); dibujarPista(now); }
+  navEstado();
+  if (!hayGL || document.hidden) return;
+  medirVisibles();
+  const O = ESC.cubo;
+  const quieto = reducido;
+  // --- objetivo del muelle: cursor, arrastre, giroscopio o vaivén automático
+  const auto = (now - P.ultimo) > 2600 || (tactil && !TOQUE.arrastra && !TOQUE.giro);
+  let ox = 0, oy = 0;
+  if (auto) { ox = Math.sin(ESC.t * 0.5) * 0.45; oy = Math.sin(ESC.t * 0.31 + 1.2) * 0.35; }
+  else if (tactil) { ox = TOQUE.dx; oy = TOQUE.dy; }
+  else { ox = P.nx; oy = P.ny; }
+  if (quieto) { ox = 0.25; oy = -0.15; }
+  const Z = ESC.zoom;
+
+  if (PR.heroVisible && O) {
+    O.sx.o = oy * 0.34; O.sy.o = ox * 0.42; O.sx.paso(dt); O.sy.paso(dt);
+    if (O.entrada >= 0 && O.entrada < 1) O.entrada = Math.min(1, O.entrada + dt * 0.75);
+    const e = O.entrada < 0 ? 0 : O.entrada, k = 1 - Math.pow(1 - e, 4);
+    const h = PR.hero;                       // 0 → 1 mientras el hero sale: el cubo se encara y se acerca hasta llenar la pantalla
+    const enc = h < 0.001 ? 0 : Math.pow(h, 1.4);
+    const baseX = lerp(-0.45, 0, enc), baseY = lerp(0.62, 0, enc), baseZ = lerp(0.08, 0, enc);
+    const balanceo = quieto ? 0 : Math.sin(ESC.t * 0.15) * 0.05 * (1 - enc);
+    O.pivote.rotation.set(baseX + O.sx.x * (1 - enc), baseY + O.sy.x * (1 - enc) + balanceo, baseZ);
+    const x0 = movil() ? 0.1 : 1.2, y0 = movil() ? 1.15 : 1.4, esc0 = movil() ? 0.38 : 0.74;
+    O.pivote.position.set(lerp(x0, 0, enc), lerp(y0, 0.9, enc), lerp(0, 4.2, enc));
+    const s = (0.62 + 0.38 * k) * esc0; O.pivote.scale.setScalar(s);
+    O.fantasmas.forEach((g, i) => {
+      O.fx[i].o = O.sx.o; O.fy[i].o = O.sy.o; O.fx[i].paso(dt); O.fy[i].paso(dt);
+      g.rotation.set(baseX + O.fx[i].x * (1 - enc), baseY + O.fy[i].x * (1 - enc) + balanceo, baseZ);
+      g.position.copy(O.pivote.position).add(tmp.set(0.3 * (i + 1), 0.04 * (i + 1), -0.4 * (i + 1)).multiplyScalar(s));
+      g.scale.setScalar(s); g.material.opacity = g.userData.op * k * (1 - enc);
     });
-  </script>
-
-  <script>
-    /* ============================================================
-       CONFIGURACIÓN — editá solo este bloque
-       ============================================================ */
-    const CONFIG = {
-      // URL directa del archivo del mod (ej: un Release de GitHub). Vacío = "próximamente".
-      DOWNLOAD_URL: 'https://github.com/sulawko/monster-input-buffer/releases/download/v4.0.4/sulawko.monster-input-buffer.geode',
-      // Hash SHA-256 del archivo, para que la gente verifique la descarga. Vacío = se oculta.
-      SHA256: '8be8532d910abad96bb3594c0137b79b5c70046972cef67e5e31133fe35b0abc',
-      // ID de un video de YouTube (ej: 'dQw4w9WgXcQ'). Vacío = la sección de video se oculta.
-      YOUTUBE_ID: '',
-      // Repo para el contador real de descargas (suma de los Releases).
-      REPO: 'sulawko/monster-input-buffer'
-    };
-
-    /* ============================================================
-       IDIOMAS (ES por defecto, EN con el botón)
-       ============================================================ */
-    const EN = {
-      skip: 'Skip to content', gh_label: 'GitHub', menu_label: 'Open menu',
-      nav_features: 'Features', nav_install: 'Install', nav_faq: 'FAQ', nav_community: 'Community', nav_download: 'Download',
-      badge: 'Available for Geometry Dash 2.208',
-      hero_sub: 'A SuLawko mod that makes playing feel a lot easier.',
-      hero_copy: 'Forget frustrating timing. Monster Input Buffer shortens the gap between your hand and the game so every jump lands when you meant it to. You focus on the music… and on winning.',
-      cta_hero: 'Download now', cta_feel: 'See how it feels',
-      hero_note: 'Free · For Geometry Dash 2.208 · Made by SuLawko',
-      stat_version: 'Compatible version', stat_free: 'Cost, always free', stat_downloads: 'Downloads', stat_levels: 'Levels to conquer',
-      feat_eyebrow: 'Why Monster Input Buffer', feat_title: 'Designed so you only think about playing.',
-      feat_sub: 'No complicated setup, no jargon. Install, play and feel the difference.',
-      f1_t: 'Precision', f1_p: 'Your clicks register when you mean them to. Fewer jumps lost by a few milliseconds.',
-      f2_t: 'Snappy response', f2_p: 'Your input is translated quickly, without that feeling of fighting the game.',
-      f3_t: 'More flow', f3_p: 'Play more relaxed. The level\'s rhythm leads, not the anxiety about timing.',
-      show_eyebrow: 'The experience', show_title: 'Less fight. More flow.',
-      show_p: 'Forget mashing the button "just in case" and failing anyway. Monster Input Buffer follows your natural rhythm so you reach that state where the level flows and you just follow the music.',
-      chip1: 'No setup', chip2: '2.208 compatible', chip3: 'Light & clean', chip4: 'Made by SuLawko',
-      vid_eyebrow: 'In action', vid_title: 'See how it works.',
-      inst_eyebrow: 'Installation', inst_title: 'Ready in three steps.',
-      inst_sub: 'No hassle. If something goes wrong, drop by the Discord and we\'ll help.',
-      s1_t: 'Download the mod', s1_p: 'Get the latest version from the download button. Always from this page or the official repository.',
-      s2_t: 'Install it', s2_p: 'Follow the instructions that come with the file to add it to your Geometry Dash 2.208.',
-      s3_t: 'Open the game and play', s3_p: 'Launch Geometry Dash, jump into a level and feel the difference from the first try.',
-      req: '<strong>Requirements:</strong> Geometry Dash version 2.208 on PC.',
-      faq_eyebrow: 'FAQ', faq_title: 'What people ask most.',
-      q1: 'Is it safe?',
-      a1: 'It is an unofficial mod made by SuLawko. Download it only from this page or the <a href="https://github.com/sulawko/monster-input-buffer" target="_blank" rel="noopener">official repository</a> and, if the SHA-256 hash is published, check it matches your file. If your antivirus complains, that is common with this kind of file: ask on Discord if in doubt.',
-      q2: 'Is it cheating? Can I use it for records?',
-      a2: 'Monster Input Buffer is an input buffer: it helps with the timing of your clicks. Which mods are accepted for records or rankings is decided by each community, list or moderator, so check their rules before submitting a record. For playing and practicing, no problem.',
-      q3: 'Can I get banned for using it?',
-      a3: 'It is not an official RobTop mod and we do not control third-party rules (lists, servers or tournaments). Use it at your own discretion and check the rules wherever you plan to compete.',
-      q4: 'Is it compatible with other mods?',
-      a4: 'It is made for Geometry Dash 2.208. If you notice a conflict with another mod, tell us which one on Discord or open a report on GitHub and we will look into it.',
-      q5: 'It doesn\'t work, what do I do?',
-      a5: 'Make sure your game is version 2.208 and that you followed the install steps. If it still doesn\'t work, <a href="https://discord.gg/XYz79HdKPS" target="_blank" rel="noopener">write to us on Discord</a> or <a href="https://github.com/sulawko/monster-input-buffer/issues" target="_blank" rel="noopener">open a report on GitHub</a>.',
-      q6: 'Does it cost anything?', a6: 'No. It is free and it will stay that way.',
-      log_eyebrow: 'Versions', log_title: 'What\'s new.', log_first: 'First public release',
-      log1: 'Launch of the mod for Geometry Dash 2.208.', log2: 'Future changes will be posted here and on Discord.',
-      com_eyebrow: 'Community', com_title: 'Join in, try it and tell us.',
-      com_p: 'Questions, suggestions and reports are shared here. Your feedback makes the mod better.',
-      com_discord: 'Join the Discord', com_bug: 'Report a bug',
-      dl_eyebrow: 'Download', dl_title: 'Ready to master the game?',
-      dl_p: 'Free and compatible with Geometry Dash version 2.208.',
-      dl_btn: 'Download Monster Input Buffer', dl_soon: 'Download coming soon', dl_meta: 'Geometry Dash 2.208',
-      dl_meta_soon: 'The download isn\'t available yet. Join the Discord to be the first to know when it is.',
-      copy: 'Copy', copied: 'Copied!',
-      foot_tag: 'A SuLawko mod for Geometry Dash.',
-      disc: 'Monster Input Buffer is an unofficial mod made by <strong>SuLawko</strong>. © 2026 SuLawko. All rights reserved: redistribution or republishing under another name or author is not allowed.<br />Geometry Dash © RobTop Games. All trademarks belong to their respective owners.'
-    };
-    const ES_DL = {
-      dl_btn: 'Descargar Monster Input Buffer', dl_soon: 'Descarga próximamente',
-      dl_meta: 'Geometry Dash 2.208',
-      dl_meta_soon: 'La descarga todavía no está disponible. Unite al Discord para enterarte primero cuando salga.',
-      copy: 'Copiar', copied: '¡Copiado!'
-    };
-
-    const i18nEls = [...document.querySelectorAll('[data-i18n], [data-i18n-html], [data-i18n-attr]')];
-    const ES = {};
-    i18nEls.forEach(el => {
-      if (el.dataset.i18n) ES[el.dataset.i18n] = ES[el.dataset.i18n] ?? el.textContent.trim().replace(/\s+/g, ' ');
-      if (el.dataset.i18nHtml) ES[el.dataset.i18nHtml] = ES[el.dataset.i18nHtml] ?? el.innerHTML.trim();
-      if (el.dataset.i18nAttr) {
-        const [attr, key] = el.dataset.i18nAttr.split(':');
-        ES[key] = el.getAttribute(attr);
-      }
-    });
-    Object.assign(ES, ES_DL);
-
-    let lang = 'en';
-    const dict = () => (lang === 'en' ? EN : ES);
-    const t = (k) => dict()[k] ?? ES[k] ?? k;
-
-    function applyLang(l) {
-      lang = l;
-      document.documentElement.lang = l;
-      i18nEls.forEach(el => {
-        if (el.id === 'dl-label' || el.id === 'dl-meta') return; // los maneja renderDownload()
-        if (el.dataset.i18n) el.textContent = t(el.dataset.i18n);
-        if (el.dataset.i18nHtml) el.innerHTML = t(el.dataset.i18nHtml);
-        if (el.dataset.i18nAttr) {
-          const [attr, key] = el.dataset.i18nAttr.split(':');
-          el.setAttribute(attr, t(key));
-        }
-      });
-      document.getElementById('lang-toggle').textContent = l === 'en' ? 'ES' : 'EN';
-      document.title = 'Monster Input Buffer — ' + (l === 'en' ? 'Never lose a run to an early click' : 'No pierdas una run por un click temprano');
-      renderDownload();
-    }
-
-    /* ============ Descarga: activa o "próximamente" ============ */
-    function renderDownload() {
-      const btn = document.getElementById('dl-btn');
-      const label = document.getElementById('dl-label');
-      const meta = document.getElementById('dl-meta');
-      if (CONFIG.DOWNLOAD_URL) {
-        btn.href = CONFIG.DOWNLOAD_URL;
-        btn.setAttribute('download', '');
-        btn.removeAttribute('aria-disabled');
-        btn.classList.remove('is-soon');
-        label.textContent = t('dl_btn');
-        meta.textContent = t('dl_meta');
-      } else {
-        btn.href = 'https://discord.gg/XYz79HdKPS';
-        btn.target = '_blank'; btn.rel = 'noopener';
-        btn.removeAttribute('download');
-        btn.classList.add('is-soon');
-        label.textContent = t('dl_soon');
-        meta.textContent = t('dl_meta_soon');
-      }
-    }
-
-    /* Hash, video y contador real de descargas */
-    if (CONFIG.SHA256) {
-      document.getElementById('hash-box').hidden = false;
-      document.getElementById('hash-code').textContent = CONFIG.SHA256;
-      const cb = document.getElementById('copy-hash');
-      cb.addEventListener('click', async () => {
-        try { await navigator.clipboard.writeText(CONFIG.SHA256); cb.textContent = t('copied'); }
-        catch (_) { cb.textContent = 'Ctrl+C'; }
-        setTimeout(() => { cb.textContent = t('copy'); }, 1800);
-      });
-    }
-    if (CONFIG.YOUTUBE_ID) {
-      const slot = document.getElementById('video-slot');
-      slot.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(CONFIG.YOUTUBE_ID) +
-        '" title="Monster Input Buffer" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
-      document.getElementById('video').hidden = false;
-    }
-    fetch('https://api.github.com/repos/' + CONFIG.REPO + '/releases')
-      .then(r => (r.ok ? r.json() : []))
-      .then(rels => {
-        const total = rels.reduce((s, r) => s + (r.assets || []).reduce((a, x) => a + (x.download_count || 0), 0), 0);
-        if (total > 0) {
-          const box = document.getElementById('dl-stat'); const num = document.getElementById('dl-count');
-          num.textContent = total.toLocaleString(); box.hidden = false;
-        }
-      })
-      .catch(() => {});
-
-    /* Idioma inicial: guardado > navegador */
-    let startLang = 'en';
-    try { startLang = localStorage.getItem('mib-lang-choice') || 'en'; } catch (_) {}
-    document.getElementById('lang-toggle').addEventListener('click', () => { const n = lang === 'es' ? 'en' : 'es'; applyLang(n); try { localStorage.setItem('mib-lang-choice', n); } catch (_) {} });
-    applyLang(startLang);
-  </script>
+    O.esc.environmentRotation.y = 0.9 + (quieto ? 0 : ESC.t * 0.09);
+    uCubo.uDifr.value = 1.5 * k;
+    const gx = O.sx.x * 57.3, gy = O.sy.x * 57.3;
+    hudTilt.textContent = `${gx >= 0 ? "+" : ""}${fmt(gx, 1)}° / ${gy >= 0 ? "+" : ""}${fmt(gy, 1)}°`;
+    renderer.render(O.esc, O.cam); ESC.etapa = "hero";
+  } else if (PR.zoomVisible && document.body.classList.contains("estatico")) {
+    if (ESC.etapa !== "nada") { renderer.clear(); ESC.etapa = "nada"; }
+  } else if (PR.zoomVisible && Z) {
+    const q = PR.zoom, lg = logDeProgreso(q);
+    Z.px.o = P.nx; Z.py.o = -P.ny; Z.px.paso(dt); Z.py.paso(dt);
+    Z.u.uLog.value = lg; Z.u.uPulsos.value = 0; Z.u.uMarcas.value = 1; Z.u.uEntrada.value = 1 - clamp(q / 0.035, 0, 1);
+    Z.u.uPuntero.value.set(Z.px.x, Z.py.x);
+    Z.u.uFlood.value = actualizarZoomHUD(lg);
+    renderer.render(Z.esc, Z.cam); ESC.etapa = "zoom";
+  } else if (PR.demoVisible && Z) {
+    Z.px.o = P.nx * 0.5; Z.py.o = -P.ny * 0.5; Z.px.paso(dt); Z.py.paso(dt);
+    Z.u.uLog.value = 1.75 - PR.demo * 0.3; Z.u.uPulsos.value = quieto ? 0 : 0.35 + 0.65 * DEMO.brillo; Z.u.uMarcas.value = 0; Z.u.uEntrada.value = 0; Z.u.uFlood.value = 0;
+    Z.u.uPuntero.value.set(Z.px.x, Z.py.x);
+    renderer.render(Z.esc, Z.cam); ESC.etapa = "demo";
+  } else if (PR.instVisible && ESC.inst) {
+    const s = ESC.inst; const q = quieto ? 1 : PR.inst;
+    // cámara: órbita de frente-alta a tres cuartos y acercamiento a la ranura
+    const kz = clamp((q - 0.55) / 0.45, 0, 1);
+    const a = lerp(0.85, 0.32, Math.min(1, q / 0.6)), el = lerp(0.95, 0.55, Math.min(1, q / 0.6)), r = lerp(7.6, 4.3, kz);
+    s.sx.o = P.nx * 0.12; s.sy.o = P.ny * 0.06; s.sx.paso(dt); s.sy.paso(dt);
+    const mira = tmp.set(lerp(0, -0.9, kz), lerp(0.25, 0.38, kz), lerp(0, -0.1, kz));
+    s.cam.position.set(mira.x + Math.sin(a + s.sx.x) * r * Math.cos(el + s.sy.x), mira.y + Math.sin(el + s.sy.x) * r, mira.z + Math.cos(a + s.sx.x) * r * Math.cos(el + s.sy.x));
+    s.cam.lookAt(mira);
+    // el .geode cae y encaja en geode/mods
+    const c = clamp(q / 0.38, 0, 1), ce = 1 - Math.pow(1 - c, 3);
+    s.paquete.position.set(-0.9, lerp(2.4, 0.4015, ce), -0.1);
+    s.paquete.rotation.set(lerp(-2.4, 0, ce), lerp(1.6, 0, ce), lerp(0.6, 0, ce));
+    s.sombra.material.opacity = 0.15 + 0.7 * ce; s.sombra.scale.setScalar(1.8 - 0.8 * ce);
+    // LED en ola y brillo por el panel
+    const on = clamp((q - 0.42) / 0.3, 0, 1) * 24;
+    for (let i = 0; i < 24; i++) { const k2 = clamp(on - i, 0, 1); colLed.copy(colCian).multiplyScalar(0.05 + 2.2 * k2 * (0.75 + 0.25 * Math.sin(ESC.t * 6 + i))); s.leds.setColorAt(i, colLed); }
+    s.leds.instanceColor.needsUpdate = true;
+    s.brillo.material.uniforms.uBrillo.value = clamp((q - 0.5) / 0.45, 0, 1);
+    pasosEl[0].classList.toggle("on", q > 0.02); pasosEl[1].classList.toggle("on", q >= 0.36); pasosEl[2].classList.toggle("on", q >= 0.6);
+    renderer.render(s.esc, s.cam); ESC.etapa = "inst";
+  } else if (PR.pieVisible && Z) {
+    const p = ESC.pie; p.px.o = quieto ? 0.2 : P.nx; p.py.o = quieto ? -0.1 : -P.ny; p.px.paso(dt); p.py.paso(dt);
+    Z.u.uLog.value = 2.25 + (PR.pie - 1) * 0.35; Z.u.uPulsos.value = quieto ? 0 : 0.5; Z.u.uMarcas.value = 0; Z.u.uEntrada.value = 0; Z.u.uFlood.value = 0;
+    Z.u.uPuntero.value.set(p.px.x, p.py.x);
+    renderer.render(Z.esc, Z.cam); ESC.etapa = "pie";
+  } else if (ESC.etapa !== "nada") { renderer.clear(); ESC.etapa = "nada"; }
+  if (ESC.etapa !== "zoom") document.body.classList.remove("flood-on");
+}
+if (hayGL) {
+  renderer.setAnimationLoop((t) => fotograma(t));
+  document.addEventListener("visibilitychange", () => { if (document.hidden) renderer.setAnimationLoop(null); else { ultimoT = performance.now(); renderer.setAnimationLoop((t) => fotograma(t)); } });
+} else {
+  const bucle = (t) => { fotograma(t); requestAnimationFrame(bucle); }; requestAnimationFrame(bucle);
+  $("#zoom .fijo").style.display = "none";
+}
+</script>
 </body>
 </html>

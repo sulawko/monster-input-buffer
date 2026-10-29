@@ -48,4 +48,4 @@ Unofficial mod, not affiliated with RobTop Games or the Geode team.
 
 ---
 
-<sub>This repository contains the mod's website and its downloads (Releases). To update the download, edit the `CONFIG` block in `index.html` (`DOWNLOAD_URL`, `SHA256`, `YOUTUBE_ID`).</sub>
+<sub>This repository contains the mod's website and its downloads (Releases). To update the download, edit the `CONFIG` block in `index.html` (`DOWNLOAD_URL`, `SHA256`) and the version label (`v4.0.4`) that appears in the page text.</sub>
